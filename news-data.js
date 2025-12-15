@@ -1,6 +1,30 @@
 (() => {
   const defaultNews = [
       {
+          "id": "news-1765808396349",
+          "title": "【配信告知】２周年記念配信決定",
+          "date": "2025-12-16",
+          "tags": [
+              "STREAM"
+          ],
+          "thumbnail": "../images/news002.png",
+          "excerpt": "12/20㈯22:00からリブランディング＆２周年記念配信決定。サプライズも…！？",
+          "body": "<h2>12/20㈯22:00～２周年記念配信決定</h2>\n<p>公式YouTubeチャンネルにて配信</p>\n<p>配信リンクは<a href=\"https://www.youtube.com/live/xb7QdSKes1w?si=fiEjeig1zQMmNqrV\" target=\"_blank\">こちら</a></p>\n<p>参加ストリーマー</p>\n<ul><li>Oshio</li><li>財黒オクト</li><li>星子にあ</li><li>Lateω</li></ul>\n<p>以上４名</p>\n<p>配信後にはサプライズも？</p>\n<p>同日、プレミア公開される動画もお見逃しなく</p>\n<p>プレミア公開動画は<a href=\"https://youtu.be/QY6dfnIhtW0?si=gOLpPsbi8OkiNhdb\" target=\"_blank\">こちら</a></p>",
+          "createdAt": "2025-12-15T14:19:56.349Z"
+      },
+      {
+          "id": "news-1765808628770",
+          "title": "チーム名変更のお知らせ",
+          "date": "2025-12-08",
+          "tags": [
+              "ANNOUNCEMENT"
+          ],
+          "thumbnail": "../images/news003.png",
+          "excerpt": "【OTAKUSTREAMERS】は【RAID3】へチーム名を変更致しました。",
+          "body": "<p>この度、新たなスタートを切る事となり、チーム名を変更致しました</p>\n\n<p>前) OTAKU STREAMERS</p>\n\n<p>後) RAID3 (レイドスリー)</p>\n\n<p>これまで支えてくださった関係者の皆様に心より感謝申し上げます</p>\n\n<p>新体制の元、更なる挑戦を続けて参りますので、引き続きご支援の程宜しくお願い致します</p>",
+          "createdAt": "2025-12-15T14:23:48.770Z"
+      },
+      {
           "id": "001",
           "title": "RAID3 公式サイトリニューアルのお知らせ",
           "date": "2024-12-15",
