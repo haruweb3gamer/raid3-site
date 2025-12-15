@@ -1,0 +1,269 @@
+# RAID3 サイト編集ガイド（Cursor用）
+
+## 📁 ファイル構成
+
+```
+raid3-site/
+├── index.html          ← ホームページ（メイン）
+├── styles.css          ← デザイン（色やレイアウト）
+├── news-template.html  ← ニュース記事のテンプレート（コピー用）
+├── images/             ← ★画像を入れるフォルダ
+└── news/
+    ├── 001.html        ← ニュース記事1
+    ├── 002.html        ← ニュース記事2
+    └── 003.html        ← ニュース記事3
+```
+
+---
+
+## 🖼️ クリエイター画像を入れる方法
+
+### ステップ1：画像を準備
+
+- **推奨サイズ**: 縦長（3:4 比率）、幅 400px 以上
+- **形式**: jpg または png
+- **例**: 600×800px
+
+### ステップ2：images フォルダに画像を入れる
+
+```
+raid3-site/
+└── images/
+    ├── haru.jpg
+    ├── creator02.jpg
+    └── creator03.jpg
+```
+
+### ステップ3：HTMLを編集（Cursorで）
+
+index.html を開いて、該当するクリエイターの部分を探す：
+
+**変更前：**
+```html
+<!-- <img src="images/haru.jpg" alt="HARU" class="creator-image"> -->
+<div class="creator-placeholder">R3</div>
+```
+
+**変更後：**
+```html
+<img src="images/haru.jpg" alt="HARU" class="creator-image">
+<!-- <div class="creator-placeholder">R3</div> -->
+```
+
+つまり：
+1. `<img ...>` の行の `<!--` と `-->` を削除
+2. `<div class="creator-placeholder">` の行を `<!--` と `-->` で囲む
+
+### Cursorに頼む場合
+
+```
+HARUのクリエイターカードで、プレースホルダーの代わりに
+images/haru.jpg を表示するように変更して
+```
+
+---
+
+## 🚀 Cursorでフォルダを開く
+
+1. Cursorを起動
+2. 「File」→「Open Folder」
+3. ダウンロードした `raid3-site` フォルダを選択
+4. 左側にファイル一覧が表示される
+
+---
+
+## 📰 ニュースを追加する方法
+
+### ステップ1：記事ファイルを作成
+
+Cursorで以下のように指示：
+
+```
+news-template.html をコピーして news/004.html を作成して
+```
+
+### ステップ2：記事の内容を編集
+
+作成した 004.html を開いて、Cursorに指示：
+
+```
+このファイルの以下を変更して：
+- タイトルを「新しいパートナーシップ締結のお知らせ」に
+- 日付を「2024.12.20」に
+- タグを #PARTNERSHIP に
+- 本文を以下に変更：
+
+この度、〇〇社とパートナーシップを締結しました。
+今後、共同でWeb3ゲーミングイベントを開催予定です。
+詳細は後日発表いたします。
+```
+
+### ステップ3：ホームページにリンクを追加
+
+index.html を開いて、Cursorに指示：
+
+```
+ニュースセクションに新しいカードを追加して。
+リンクは news/004.html、タイトルは「新しいパートナーシップ締結のお知らせ」、
+タグは #PARTNERSHIP で、一番左（最新）に配置して
+```
+
+---
+
+## 👤 クリエイター情報を変更する
+
+index.html を開いて、Cursorに指示：
+
+```
+CREATOR_02 の情報を以下に変更して：
+- 名前：TARO
+- 役職：VTuber / ゲーム実況
+- Xリンク：https://x.com/taro_example
+- YouTubeリンク：https://youtube.com/@taro_example
+```
+
+---
+
+## 🏪 商品情報を変更する
+
+index.html を開いて、Cursorに指示：
+
+```
+RAID3 LOGO TEE の価格を ¥3,980 に変更して
+```
+
+---
+
+## 🎨 ABOUTの説明を変更する
+
+index.html を開いて、Cursorに指示：
+
+```
+ABOUTセクションの説明文を以下に変更して：
+
+RAID3は2024年に設立されたWeb3ゲーミングチームです。
+私たちはブロックチェーンゲームの面白さを伝えながら、
+視聴者が安心して楽しめる情報を発信しています。
+```
+
+---
+
+## 🔢 統計数字を変更する
+
+index.html を開いて、Cursorに指示：
+
+```
+ABOUTの統計を以下に変更して：
+- Creators: 12+
+- Followers: 80K+
+- Streams: 200+
+```
+
+---
+
+## 🌐 Vercelで公開する手順
+
+### 1. GitHubにアップロード
+
+1. https://github.com にログイン
+2. 「New repository」をクリック
+3. 名前を「raid3-website」に
+4. 「Create repository」をクリック
+5. 「uploading an existing file」をクリック
+6. `raid3-site` フォルダ内の全ファイルをドラッグ＆ドロップ
+7. 「Commit changes」をクリック
+
+### 2. Vercelと連携
+
+1. https://vercel.com にログイン（GitHubアカウントで）
+2. 「Add New」→「Project」
+3. 「raid3-website」を選択
+4. 「Deploy」をクリック
+5. 完了！URLが発行されます
+
+---
+
+## 🔄 サイトを更新する方法
+
+### 方法A：GitHubで直接編集
+
+1. GitHubのリポジトリを開く
+2. 編集したいファイルをクリック
+3. 鉛筆マーク（Edit）をクリック
+4. 編集して「Commit changes」
+5. Vercelが自動で更新（1〜2分）
+
+### 方法B：Cursorで編集してアップロード
+
+1. Cursorで編集
+2. 編集したファイルをGitHubにアップロード（上書き）
+3. Vercelが自動で更新
+
+---
+
+## ❓ よくある質問
+
+### Q: ニュースカードに画像を入れたい
+
+index.html のニュースカード部分：
+
+**変更前：**
+```html
+<div class="news-card-image"><div class="news-card-placeholder">R3</div></div>
+```
+
+**変更後：**
+```html
+<div class="news-card-image"><img src="images/news001.jpg" alt=""></div>
+```
+
+### Q: ニュース記事ページに画像を入れたい
+
+news/001.html などの記事ページ：
+
+**変更前：**
+```html
+<div class="news-article-image">R3</div>
+```
+
+**変更後：**
+```html
+<div class="news-article-image"><img src="../images/news001.jpg" alt=""></div>
+```
+
+※ 記事ページからは `../images/` と書く（1つ上のフォルダ）
+
+### Q: 新しいページを追加したい
+A: news-template.html をベースにして新しいページを作成できます
+
+---
+
+## 📝 タグの種類
+
+- `#ANNOUNCEMENT` - お知らせ
+- `#TEAM` - チーム関連
+- `#EVENT` - イベント
+- `#STREAM` - 配信
+- `#STORE` - グッズ
+- `#PARTNERSHIP` - パートナー
+- `#WEB3` - Web3関連
+
+---
+
+## 💡 Cursorへの指示のコツ
+
+1. **具体的に書く**
+   - ❌「ニュースを追加して」
+   - ⭕「news/004.html を作成して、タイトルは〇〇、本文は△△」
+
+2. **ファイル名を明示する**
+   - ❌「トップページを編集して」
+   - ⭕「index.html のクリエイターセクションを編集して」
+
+3. **変更前と変更後を明確に**
+   - ❌「名前を変えて」
+   - ⭕「CREATOR_02 を TARO に変更して」
+
+---
+
+困ったらClaudeに質問してください！
