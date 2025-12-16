@@ -79,10 +79,12 @@
         const filterTags = document.getElementById('filterTags');
         const sortSelect = document.getElementById('newsSort');
 
+        // 英語タグの定義
+        const TAGS = ['ANNOUNCEMENT', 'TEAM', 'EVENT', 'STORE', 'STREAM', 'WEB3'];
+
         function buildFilters() {
             filterTags.innerHTML = '';
-            if (!window.NewsData || !window.NewsData.TAGS) return;
-            Object.values(window.NewsData.TAGS).forEach(tag => {
+            TAGS.forEach(tag => {
                 const label = document.createElement('label');
                 label.className = 'filter-tag';
                 const input = document.createElement('input');
@@ -90,7 +92,7 @@
                 input.value = tag;
                 input.addEventListener('change', renderList);
                 label.appendChild(input);
-                label.appendChild(document.createTextNode(`#${tag}`));
+                label.appendChild(document.createTextNode(` #${tag}`));
                 filterTags.appendChild(label);
             });
         }
@@ -104,16 +106,29 @@
             return '../' + path;
         }
 
+        // 日付でソートする関数
+        function sortByDate(items, order) {
+            return [...items].sort((a, b) => {
+                const dateA = new Date(a.date || '1970-01-01');
+                const dateB = new Date(b.date || '1970-01-01');
+                return order === 'newest' ? dateB - dateA : dateA - dateB;
+            });
+        }
+
         function renderList() {
             if (!window.NewsData) return;
+            
             const selected = Array.from(filterTags.querySelectorAll('input:checked')).map(i => i.value);
             let items = window.NewsData.getAll();
+            
+            // タグでフィルター
             if (selected.length) {
                 items = items.filter(item => (item.tags || []).some(tag => selected.includes(tag)));
             }
-            if (sortSelect.value === 'oldest') {
-                items = [...items].reverse();
-            }
+            
+            // 日付でソート
+            const sortOrder = sortSelect.value;
+            items = sortByDate(items, sortOrder);
 
             grid.innerHTML = '';
 
