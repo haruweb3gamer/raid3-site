@@ -4,6 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEWS - RAID3</title>
+    
+    <!-- ファビコン -->
+    <link rel="icon" href="../images/R3aicon.png" type="image/png">
+    <link rel="apple-touch-icon" href="../images/R3aicon.png">
+    
+    <!-- OGP（Xシェア用） -->
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="RAID3">
+    <meta property="og:title" content="NEWS - RAID3">
+    <meta property="og:description" content="RAID3 - Web3 Gaming is Inevitable">
+    <meta property="og:image" content="https://raid3.vercel.app/images/R3aicon.png">
+    <meta property="og:url" content="https://raid3.vercel.app/news/">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@raid3__">
+    <meta name="twitter:title" content="NEWS - RAID3">
+    <meta name="twitter:description" content="RAID3 - Web3 Gaming is Inevitable">
+    <meta name="twitter:image" content="https://raid3.vercel.app/images/R3aicon.png">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -59,18 +79,33 @@
         const params = new URLSearchParams(window.location.search);
         const id = params.get('id');
 
+        // 画像パスを記事ページ用に調整する関数
+        function adjustImagePath(path) {
+            if (!path) return '';
+            // 既に ../ で始まっている場合はそのまま
+            if (path.startsWith('../')) return path;
+            // http:// や https:// で始まる場合はそのまま
+            if (path.startsWith('http://') || path.startsWith('https://')) return path;
+            // images/ で始まる場合は ../ を追加
+            if (path.startsWith('images/')) return '../' + path;
+            // それ以外もとりあえず ../ を追加
+            return '../' + path;
+        }
+
         function renderArticle() {
             const item = window.NewsData.getById(id);
             if (!item) {
                 document.getElementById('articleTitle').textContent = '記事が見つかりませんでした';
-                document.getElementById('articleImage').textContent = 'R3';
+                document.getElementById('articleImage').innerHTML = '<div class="news-card-placeholder">R3</div>';
                 document.getElementById('articleBody').innerHTML = '<p>指定された記事は存在しません。</p>';
                 document.title = '記事が見つかりません - RAID3';
                 return;
             }
 
+            // タイトル設定
             document.title = `${item.title} - RAID3`;
 
+            // タグ
             const tags = document.getElementById('articleTags');
             tags.innerHTML = '';
             (item.tags || []).forEach(tag => {
@@ -83,11 +118,12 @@
             document.getElementById('articleTitle').textContent = item.title;
             document.getElementById('articleDate').textContent = item.date || '';
 
+            // 画像（パス調整）
             const imageWrap = document.getElementById('articleImage');
             imageWrap.innerHTML = '';
             if (item.thumbnail) {
                 const img = document.createElement('img');
-                img.src = item.thumbnail;
+                img.src = adjustImagePath(item.thumbnail);
                 img.alt = item.title;
                 imageWrap.appendChild(img);
             } else {
@@ -97,11 +133,13 @@
                 imageWrap.appendChild(placeholder);
             }
 
+            // 本文
             document.getElementById('articleBody').innerHTML = item.body || '<p>本文が準備中です。</p>';
 
+            // シェアボタン
             const share = document.getElementById('shareX');
             const url = encodeURIComponent(window.location.href);
-            const text = encodeURIComponent(item.title);
+            const text = encodeURIComponent(item.title + ' | RAID3');
             share.href = `https://twitter.com/intent/tweet?url=${url}&text=${text}`;
         }
 
@@ -109,4 +147,3 @@
     </script>
 </body>
 </html>
-
