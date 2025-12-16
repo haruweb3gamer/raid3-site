@@ -3,63 +3,425 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NEWS編集 - RAID3</title>
+    <title>NEWS管理 - RAID3</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #fff; padding: 2rem; }
+        h1 { font-size: 2rem; margin-bottom: 1rem; }
+        h2 { font-size: 1.3rem; margin: 2rem 0 1rem; border-bottom: 1px solid #333; padding-bottom: 0.5rem; }
+        
+        .export-section {
+            background: linear-gradient(135deg, #1a2a1a 0%, #0a1a0a 100%);
+            border: 2px solid #4ade80;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        .export-section h2 {
+            color: #4ade80;
+            border: none;
+            margin: 0 0 1rem 0;
+            padding: 0;
+        }
+        .export-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        .export-btn {
+            background: #4ade80;
+            color: #000;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .export-btn:hover { background: #22c55e; }
+        .export-btn.secondary {
+            background: #3b82f6;
+            color: #fff;
+        }
+        .export-btn.secondary:hover { background: #2563eb; }
+        .export-info {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            line-height: 1.6;
+        }
+        .export-info strong { color: #4ade80; }
+
+        .news-form { background: #1a1a1a; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; }
+        .form-row { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.3rem; font-weight: 500; color: #9ca3af; }
+        input, textarea, select { 
+            width: 100%; padding: 0.75rem; background: #2a2a2a; border: 1px solid #444; 
+            border-radius: 4px; color: #fff; font-size: 1rem; 
+        }
+        input:focus, textarea:focus { outline: none; border-color: #4ade80; }
+        textarea { min-height: 200px; font-family: monospace; }
+        .btn { 
+            background: #4ade80; color: #000; border: none; padding: 0.75rem 1.5rem; 
+            font-weight: bold; border-radius: 4px; cursor: pointer; margin-right: 0.5rem; 
+        }
+        .btn:hover { background: #22c55e; }
+        .btn-danger { background: #ef4444; color: #fff; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-secondary { background: #6b7280; color: #fff; }
+
+        .news-list { display: grid; gap: 1rem; }
+        .news-item { 
+            background: #1a1a1a; padding: 1rem; border-radius: 8px; 
+            display: flex; justify-content: space-between; align-items: center; 
+        }
+        .news-item-info h3 { font-size: 1rem; margin-bottom: 0.3rem; }
+        .news-item-info p { font-size: 0.8rem; color: #9ca3af; }
+        .news-item-actions { display: flex; gap: 0.5rem; }
+        .news-item-actions button { padding: 0.5rem 1rem; font-size: 0.85rem; }
+
+        .tag-input-wrap { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
+        .tag-badge { 
+            background: #4ade80; color: #000; padding: 0.25rem 0.75rem; 
+            border-radius: 999px; font-size: 0.8rem; display: flex; align-items: center; gap: 0.3rem; 
+        }
+        .tag-badge button { background: none; border: none; cursor: pointer; font-size: 1rem; line-height: 1; }
+        
+        .help-text { font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem; }
+        
+        .step-box {
+            background: #1a1a1a;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+        .step-box h4 {
+            color: #4ade80;
+            margin-bottom: 0.5rem;
+        }
+        .step-box ol {
+            margin-left: 1.5rem;
+            color: #9ca3af;
+            line-height: 1.8;
+        }
+        .step-box code {
+            background: #2a2a2a;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>📰 NEWS管理ページ</h1>
+
+    <!-- エクスポートセクション -->
+    <div class="export-section">
+        <h2>📤 公開用ファイルをエクスポート</h2>
+        <div class="export-buttons">
+            <button class="export-btn" onclick="exportNewsData()">
+                📥 news-data.js をダウンロード
+            </button>
+            <button class="export-btn secondary" onclick="exportAllArticles()">
+                📄 個別記事HTMLをダウンロード（OGP対応）
+            </button>
+        </div>
+        <p class="export-info">
+            <strong>news-data.js</strong>：ニュースデータ本体。GitHubの <code>raid3-site/news-data.js</code> に上書き。<br>
+            <strong>個別記事HTML</strong>：Xシェア時にサムネイル画像を表示するためのファイル。各記事ごとにダウンロードされます。
+        </p>
+        
+        <div class="step-box">
+            <h4>📝 公開手順</h4>
+            <ol>
+                <li>「news-data.js をダウンロード」→ GitHubの <code>news-data.js</code> に上書き</li>
+                <li>「個別記事HTMLをダウンロード」→ ダウンロードした <code>001.html</code>, <code>002.html</code>... を <code>news/</code> フォルダに追加</li>
+                <li>GitHubにプッシュ → Vercelが自動デプロイ（1〜2分）</li>
+                <li>Xでシェアするとサムネイル画像付きで表示される！</li>
+            </ol>
+        </div>
+    </div>
+
+    <h2>➕ ニュースを追加・編集</h2>
+    <div class="news-form">
+        <input type="hidden" id="editId">
+        <div class="form-row">
+            <label>ID（半角英数字、例: 001, 002）</label>
+            <input type="text" id="newsId" placeholder="001">
+        </div>
+        <div class="form-row">
+            <label>タイトル</label>
+            <input type="text" id="newsTitle" placeholder="記事タイトル">
+        </div>
+        <div class="form-row">
+            <label>日付</label>
+            <input type="date" id="newsDate">
+        </div>
+        <div class="form-row">
+            <label>サムネイル画像パス</label>
+            <input type="text" id="newsThumbnail" placeholder="images/news001.png">
+            <p class="help-text">※ images/ から始めてください（例: images/news001.png）</p>
+        </div>
+        <div class="form-row">
+            <label>タグ（Enterで追加）</label>
+            <input type="text" id="tagInput" placeholder="タグを入力してEnter">
+            <div class="tag-input-wrap" id="tagList"></div>
+        </div>
+        <div class="form-row">
+            <label>本文（HTML可）</label>
+            <textarea id="newsBody" placeholder="<p>記事の内容...</p>"></textarea>
+        </div>
+        <button class="btn" onclick="saveNews()">💾 保存</button>
+        <button class="btn btn-secondary" onclick="clearForm()">クリア</button>
+    </div>
+
+    <h2>📋 ニュース一覧</h2>
+    <div class="news-list" id="newsList"></div>
+
+    <script src="news-data.js"></script>
+    <script>
+        let currentTags = [];
+        const SITE_URL = 'https://raid3.vercel.app';
+
+        // タグ入力
+        document.getElementById('tagInput').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const tag = this.value.trim();
+                if (tag && !currentTags.includes(tag)) {
+                    currentTags.push(tag);
+                    renderTags();
+                }
+                this.value = '';
+            }
+        });
+
+        function renderTags() {
+            const container = document.getElementById('tagList');
+            container.innerHTML = currentTags.map((tag, i) => 
+                `<span class="tag-badge">#${tag} <button onclick="removeTag(${i})">×</button></span>`
+            ).join('');
+        }
+
+        function removeTag(index) {
+            currentTags.splice(index, 1);
+            renderTags();
+        }
+
+        function renderList() {
+            const list = document.getElementById('newsList');
+            const items = window.NewsData.getAll();
+            if (!items.length) {
+                list.innerHTML = '<p style="color:#666;">ニュースがありません</p>';
+                return;
+            }
+            list.innerHTML = items.map(item => `
+                <div class="news-item">
+                    <div class="news-item-info">
+                        <h3>${item.title}</h3>
+                        <p>ID: ${item.id} | ${item.date || '日付なし'} | タグ: ${(item.tags||[]).join(', ') || 'なし'}</p>
+                    </div>
+                    <div class="news-item-actions">
+                        <button class="btn" onclick="editNews('${item.id}')">編集</button>
+                        <button class="btn btn-danger" onclick="deleteNews('${item.id}')">削除</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function saveNews() {
+            const id = document.getElementById('newsId').value.trim();
+            const title = document.getElementById('newsTitle').value.trim();
+            const date = document.getElementById('newsDate').value;
+            const thumbnail = document.getElementById('newsThumbnail').value.trim();
+            const body = document.getElementById('newsBody').value;
+
+            if (!id || !title) {
+                alert('IDとタイトルは必須です');
+                return;
+            }
+
+            const editId = document.getElementById('editId').value;
+            
+            if (editId) {
+                window.NewsData.update(editId, { id, title, date, thumbnail, tags: currentTags, body });
+            } else {
+                window.NewsData.add({ id, title, date, thumbnail, tags: currentTags, body });
+            }
+
+            clearForm();
+            renderList();
+        }
+
+        function editNews(id) {
+            const item = window.NewsData.getById(id);
+            if (!item) return;
+            document.getElementById('editId').value = id;
+            document.getElementById('newsId').value = item.id;
+            document.getElementById('newsTitle').value = item.title;
+            document.getElementById('newsDate').value = item.date || '';
+            document.getElementById('newsThumbnail').value = item.thumbnail || '';
+            document.getElementById('newsBody').value = item.body || '';
+            currentTags = [...(item.tags || [])];
+            renderTags();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function deleteNews(id) {
+            if (confirm('削除しますか？')) {
+                window.NewsData.remove(id);
+                renderList();
+            }
+        }
+
+        function clearForm() {
+            document.getElementById('editId').value = '';
+            document.getElementById('newsId').value = '';
+            document.getElementById('newsTitle').value = '';
+            document.getElementById('newsDate').value = '';
+            document.getElementById('newsThumbnail').value = '';
+            document.getElementById('newsBody').value = '';
+            currentTags = [];
+            renderTags();
+        }
+
+        // news-data.js エクスポート
+        function exportNewsData() {
+            const items = window.NewsData.getAll();
+            const jsContent = `// RAID3 News Data - Generated ${new Date().toISOString()}
+(function() {
+    const defaultNews = ${JSON.stringify(items, null, 2)};
+
+    const TAGS = {
+        INFO: 'お知らせ',
+        EVENT: 'イベント',
+        MEMBER: 'メンバー',
+        COLLAB: 'コラボ',
+        MEDIA: 'メディア'
+    };
+
+    function getStoredNews() {
+        try {
+            const stored = localStorage.getItem('raid3_news');
+            return stored ? JSON.parse(stored) : null;
+        } catch (e) {
+            return null;
+        }
+    }
+
+    function saveNews(news) {
+        try {
+            localStorage.setItem('raid3_news', JSON.stringify(news));
+        } catch (e) {
+            console.error('Failed to save news:', e);
+        }
+    }
+
+    function getNews() {
+        return getStoredNews() || defaultNews;
+    }
+
+    window.NewsData = {
+        getAll: function() { return getNews(); },
+        getById: function(id) { return getNews().find(n => n.id === id); },
+        add: function(item) {
+            const news = getNews();
+            news.unshift(item);
+            saveNews(news);
+        },
+        update: function(id, updates) {
+            const news = getNews();
+            const index = news.findIndex(n => n.id === id);
+            if (index !== -1) {
+                if (updates.id && updates.id !== id) {
+                    news[index] = { ...news[index], ...updates };
+                } else {
+                    news[index] = { ...news[index], ...updates };
+                }
+                saveNews(news);
+            }
+        },
+        remove: function(id) {
+            const news = getNews().filter(n => n.id !== id);
+            saveNews(news);
+        },
+        reset: function() {
+            localStorage.removeItem('raid3_news');
+        },
+        TAGS: TAGS
+    };
+})();`;
+
+            downloadFile('news-data.js', jsContent);
+            alert('news-data.js をダウンロードしました！\n\nGitHubの raid3-site/news-data.js に上書きしてください。');
+        }
+
+        // 個別記事HTMLエクスポート
+        function exportAllArticles() {
+            const items = window.NewsData.getAll();
+            if (!items.length) {
+                alert('ニュースがありません');
+                return;
+            }
+
+            items.forEach(item => {
+                const html = generateArticleHTML(item);
+                downloadFile(`${item.id}.html`, html);
+            });
+
+            alert(`${items.length}件の記事HTMLをダウンロードしました！\n\nGitHubの raid3-site/news/ フォルダに追加してください。`);
+        }
+
+        function generateArticleHTML(item) {
+            // サムネイルURLを生成（フルURL）
+            let ogImage = `${SITE_URL}/images/R3aicon.png`; // デフォルト
+            if (item.thumbnail) {
+                if (item.thumbnail.startsWith('http')) {
+                    ogImage = item.thumbnail;
+                } else if (item.thumbnail.startsWith('images/')) {
+                    ogImage = `${SITE_URL}/${item.thumbnail}`;
+                } else {
+                    ogImage = `${SITE_URL}/images/${item.thumbnail}`;
+                }
+            }
+
+            const articleUrl = `${SITE_URL}/news/${item.id}.html`;
+            const title = escapeHtml(item.title);
+            const description = item.body ? escapeHtml(item.body.replace(/<[^>]*>/g, '').substring(0, 100)) : 'RAID3 - Web3 Gaming is Inevitable';
+
+            return `<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title} - RAID3</title>
+    
+    <!-- ファビコン -->
+    <link rel="icon" href="../images/R3aicon.png" type="image/png">
+    <link rel="apple-touch-icon" href="../images/R3aicon.png">
+    
+    <!-- OGP（Xシェア用） -->
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="RAID3">
+    <meta property="og:title" content="${title} - RAID3">
+    <meta property="og:description" content="${description}">
+    <meta property="og:image" content="${ogImage}">
+    <meta property="og:url" content="${articleUrl}">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@raid3__">
+    <meta name="twitter:title" content="${title} - RAID3">
+    <meta name="twitter:description" content="${description}">
+    <meta name="twitter:image" content="${ogImage}">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../styles.css">
-    <style>
-        .export-section {
-            background: #1a1a1a;
-            border: 2px solid #c8ff00;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-        .export-section h3 {
-            color: #c8ff00;
-            font-family: 'Bebas Neue', sans-serif;
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-        }
-        .export-section p {
-            color: #999;
-            font-size: 0.85rem;
-            margin-bottom: 1rem;
-        }
-        .export-btn {
-            background: #c8ff00;
-            color: #000;
-            border: none;
-            padding: 1rem 2rem;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .export-btn:hover {
-            background: #fff;
-            transform: scale(1.05);
-        }
-        .export-steps {
-            background: #111;
-            padding: 1rem;
-            margin-top: 1rem;
-            text-align: left;
-            font-size: 0.8rem;
-            color: #ccc;
-        }
-        .export-steps ol {
-            margin: 0.5rem 0 0 1.5rem;
-            padding: 0;
-        }
-        .export-steps li {
-            margin-bottom: 0.5rem;
-        }
-        .export-steps strong {
-            color: #c8ff00;
-        }
-    </style>
 </head>
 <body>
     <nav id="navbar">
@@ -71,346 +433,64 @@
             </svg>
         </a>
         <ul class="nav-links">
-            <li><a href="../news/index.html">News</a></li>
+            <li><a href="index.html">News</a></li>
             <li><a href="../index.html#creators">Creators</a></li>
             <li><a href="../index.html#about">About</a></li>
             <li><a href="https://suzuri.jp/RAID3" target="_blank">Store</a></li>
         </ul>
     </nav>
 
-    <section class="news-editor">
-        <div class="section-header">
-            <p class="section-subtitle">Create & Edit</p>
-            <h2 class="section-title">NEWS EDITOR</h2>
-        </div>
+    <article class="news-article">
+        <header class="news-article-header">
+            <a href="index.html" class="news-article-back">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+                Back to News
+            </a>
+            <div class="news-article-tags">${(item.tags || []).map(t => `<span class="news-tag">#${escapeHtml(t)}</span>`).join('')}</div>
+            <h1 class="news-article-title">${title}</h1>
+            <p class="news-article-date">${item.date || ''}</p>
+        </header>
 
-        <!-- ★★★ エクスポートセクション ★★★ -->
-        <div class="export-section">
-            <h3>📦 サイトに公開する</h3>
-            <p>編集が完了したら、このボタンでファイルをダウンロードしてGitHubにアップロードしてください。</p>
-            <button class="export-btn" onclick="exportNewsData()">
-                📥 news-data.js をダウンロード
-            </button>
-            <div class="export-steps">
-                <strong>公開手順：</strong>
-                <ol>
-                    <li>上のボタンをクリックしてファイルをダウンロード</li>
-                    <li>GitHubのリポジトリを開く</li>
-                    <li>「Add file」→「Upload files」をクリック</li>
-                    <li>ダウンロードした <strong>news-data.js</strong> をドラッグ＆ドロップ</li>
-                    <li>「Commit changes」をクリック</li>
-                    <li>1〜2分でVercelが自動更新！</li>
-                </ol>
+        <div class="news-article-image">${item.thumbnail ? `<img src="../${item.thumbnail}" alt="${title}">` : '<div class="news-card-placeholder">R3</div>'}</div>
+        <div class="news-article-body">${item.body || '<p>本文が準備中です。</p>'}</div>
+
+        <div class="news-article-share">
+            <p>Share</p>
+            <div class="share-buttons">
+                <a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(articleUrl)}&text=${encodeURIComponent(item.title + ' | RAID3')}" target="_blank" class="share-btn">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </a>
             </div>
         </div>
-
-        <div class="news-editor-grid">
-            <form id="newsForm" class="news-editor-form">
-                <div class="form-row">
-                    <label for="title">タイトル</label>
-                    <input id="title" name="title" type="text" required placeholder="記事タイトル">
-                </div>
-
-                <div class="form-row">
-                    <label for="date">日付</label>
-                    <input id="date" name="date" type="date" required>
-                </div>
-
-                <div class="form-row">
-                    <label>タグ（複数選択可）</label>
-                    <div class="tag-checkboxes" id="tagCheckboxes"></div>
-                </div>
-
-                <div class="form-row">
-                    <label for="thumbnailUrl">サムネイル画像パス（任意）</label>
-                    <input id="thumbnailUrl" name="thumbnailUrl" type="text" placeholder="images/ファイル名.png">
-                    <small>※ images フォルダに画像を入れた場合は「images/ファイル名.png」と入力（../は不要）</small>
-                </div>
-
-                <div class="form-row">
-                    <label for="excerpt">概要（任意）</label>
-                    <textarea id="excerpt" name="excerpt" rows="2" placeholder="一覧に表示する短い説明"></textarea>
-                </div>
-
-                <div class="form-row">
-                    <label for="body">本文（HTML可）</label>
-                    <textarea id="body" name="body" rows="10" placeholder="<p>本文を入力</p>" required></textarea>
-                    <small>※HTMLタグが使えます。&lt;p&gt;段落&lt;/p&gt; &lt;h2&gt;見出し&lt;/h2&gt; &lt;ul&gt;&lt;li&gt;リスト&lt;/li&gt;&lt;/ul&gt;</small>
-                </div>
-
-                <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">保存</button>
-                    <button type="button" id="resetBtn" class="btn btn-secondary">フォームをリセット</button>
-                    <button type="button" id="resetDataBtn" class="btn btn-secondary">初期データに戻す</button>
-                </div>
-            </form>
-
-            <div class="news-editor-preview">
-                <div class="preview-header">
-                    <h3>現在のニュース一覧</h3>
-                    <p class="preview-note">クリックで編集／削除</p>
-                </div>
-                <div id="newsList" class="news-editor-list"></div>
-            </div>
-        </div>
-    </section>
+    </article>
 
     <footer style="text-align: center; padding: 2rem; border-top: 1px solid #2a2a2a;">
         <p style="font-size: 0.7rem; color: #666;">&copy; 2025 RAID3. All rights reserved.</p>
     </footer>
-
-    <script src="../news-data.js"></script>
-    <script>
-        // 簡易アクセス制限（パスコード方式）
-        const ADMIN_PASSCODE = '05120315';
-        const AUTH_KEY = 'newsAdminAuth';
-        (function gatekeep() {
-            const stored = localStorage.getItem(AUTH_KEY);
-            if (stored === ADMIN_PASSCODE) return;
-            const input = prompt('ニュース編集ページのパスコードを入力してください。');
-            if (input === ADMIN_PASSCODE) {
-                localStorage.setItem(AUTH_KEY, ADMIN_PASSCODE);
-                return;
-            }
-            alert('権限がありません。トップへ戻ります。');
-            location.href = '../index.html';
-        })();
-
-        const form = document.getElementById('newsForm');
-        const titleInput = document.getElementById('title');
-        const dateInput = document.getElementById('date');
-        const excerptInput = document.getElementById('excerpt');
-        const bodyInput = document.getElementById('body');
-        const thumbUrlInput = document.getElementById('thumbnailUrl');
-        const tagBox = document.getElementById('tagCheckboxes');
-        const listWrap = document.getElementById('newsList');
-        const resetBtn = document.getElementById('resetBtn');
-        const resetDataBtn = document.getElementById('resetDataBtn');
-
-        let editId = null;
-
-        function buildTagInputs() {
-            tagBox.innerHTML = '';
-            window.NewsData.TAGS.forEach(tag => {
-                const label = document.createElement('label');
-                label.className = 'checkbox-label';
-                const input = document.createElement('input');
-                input.type = 'checkbox';
-                input.value = tag;
-                label.appendChild(input);
-                label.appendChild(document.createTextNode(`#${tag}`));
-                tagBox.appendChild(label);
-            });
+</body>
+</html>`;
         }
 
-        function setCheckedTags(tags = []) {
-            Array.from(tagBox.querySelectorAll('input[type="checkbox"]')).forEach(input => {
-                input.checked = tags.includes(input.value);
-            });
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
-        function renderList() {
-            const items = window.NewsData.getAll();
-            listWrap.innerHTML = '';
-            if (!items.length) {
-                listWrap.innerHTML = '<p class="news-empty">ニュースはありません。</p>';
-                return;
-            }
-
-            items.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'news-editor-card';
-
-                const header = document.createElement('div');
-                header.className = 'news-editor-card-head';
-                const title = document.createElement('h4');
-                title.textContent = item.title;
-                const meta = document.createElement('span');
-                meta.className = 'news-editor-meta';
-                meta.textContent = item.date;
-                header.appendChild(title);
-                header.appendChild(meta);
-
-                const tags = document.createElement('div');
-                tags.className = 'news-editor-tags';
-                (item.tags || []).forEach(tag => {
-                    const badge = document.createElement('span');
-                    badge.className = 'news-tag';
-                    badge.textContent = `#${tag}`;
-                    tags.appendChild(badge);
-                });
-
-                const actions = document.createElement('div');
-                actions.className = 'news-editor-actions';
-
-                const editBtn = document.createElement('button');
-                editBtn.className = 'btn btn-secondary';
-                editBtn.textContent = '編集';
-                editBtn.onclick = () => fillForm(item);
-
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'btn btn-secondary';
-                deleteBtn.textContent = '削除';
-                deleteBtn.onclick = () => {
-                    if (confirm('削除しますか？')) {
-                        window.NewsData.remove(item.id);
-                        renderList();
-                    }
-                };
-
-                actions.appendChild(editBtn);
-                actions.appendChild(deleteBtn);
-
-                card.appendChild(header);
-                card.appendChild(tags);
-                card.appendChild(actions);
-                listWrap.appendChild(card);
-            });
-        }
-
-        function fillForm(item) {
-            editId = item.id;
-            titleInput.value = item.title || '';
-            dateInput.value = item.date || '';
-            excerptInput.value = item.excerpt || '';
-            bodyInput.value = item.body || '';
-            thumbUrlInput.value = item.thumbnail || '';
-            setCheckedTags(item.tags || []);
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        async function handleSubmit(e) {
-            e.preventDefault();
-            const title = titleInput.value.trim();
-            if (!title) return alert('タイトルを入力してください。');
-
-            const tags = Array.from(tagBox.querySelectorAll('input:checked')).map(i => i.value);
-            const date = dateInput.value || new Date().toISOString().slice(0, 10);
-            const excerpt = excerptInput.value.trim();
-            const body = bodyInput.value.trim() || '<p>本文が準備中です。</p>';
-            const thumbnail = thumbUrlInput.value.trim() || '';
-
-            const payload = {
-                id: editId || `news-${Date.now()}`,
-                title,
-                date,
-                tags,
-                thumbnail,
-                excerpt,
-                body,
-                createdAt: editId ? (window.NewsData.getById(editId)?.createdAt || new Date().toISOString()) : new Date().toISOString()
-            };
-
-            window.NewsData.upsert(payload);
-            alert('保存しました。\n\n※公開するには「news-data.jsをダウンロード」ボタンを押してGitHubにアップロードしてください。');
-            editId = null;
-            form.reset();
-            renderList();
-        }
-
-        function resetForm() {
-            editId = null;
-            form.reset();
-            setCheckedTags([]);
-        }
-
-        // ★★★ エクスポート機能 ★★★
-        function exportNewsData() {
-            const items = window.NewsData.getAll();
-            
-            // news-data.js のコードを生成
-            const jsCode = `(() => {
-  const defaultNews = ${JSON.stringify(items, null, 4).replace(/\n/g, '\n  ')};
-
-  const TAGS = ['ANNOUNCEMENT', 'TEAM', 'EVENT', 'STORE', 'STREAM', 'WEB3'];
-  const STORAGE_KEY = 'newsData';
-
-  const load = () => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return [...defaultNews];
-      const parsed = JSON.parse(raw);
-      if (!Array.isArray(parsed) || parsed.length === 0) return [...defaultNews];
-      return parsed;
-    } catch {
-      return [...defaultNews];
-    }
-  };
-
-  const persist = (items) => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  };
-
-  const sortDesc = (items) =>
-    [...items].sort((a, b) => new Date(b.date || b.createdAt || 0) - new Date(a.date || a.createdAt || 0));
-
-  const getAll = () => sortDesc(load());
-
-  const getById = (id) => load().find((item) => item.id === id);
-
-  const upsert = (payload) => {
-    const items = load();
-    const index = items.findIndex((i) => i.id === payload.id);
-    if (index >= 0) {
-      items[index] = { ...items[index], ...payload };
-    } else {
-      items.push(payload);
-    }
-    persist(items);
-    return sortDesc(items);
-  };
-
-  const remove = (id) => {
-    persist(load().filter((i) => i.id !== id));
-    return getAll();
-  };
-
-  const reset = () => {
-    persist(defaultNews);
-    return getAll();
-  };
-
-  window.NewsData = {
-    TAGS,
-    getAll,
-    getById,
-    upsert,
-    remove,
-    reset
-  };
-})();
-`;
-
-            // ファイルをダウンロード
-            const blob = new Blob([jsCode], { type: 'application/javascript' });
+        function downloadFile(filename, content) {
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'news-data.js';
+            a.download = filename;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-
-            alert('ダウンロード完了！\n\nこのファイルをGitHubにアップロードしてください。\n（既存のnews-data.jsを上書き）');
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            buildTagInputs();
-            const today = new Date().toISOString().slice(0, 10);
-            dateInput.value = today;
-            renderList();
-
-            form.addEventListener('submit', handleSubmit);
-            resetBtn.addEventListener('click', resetForm);
-            resetDataBtn.addEventListener('click', () => {
-                if (confirm('初期データに戻しますか？現在の変更は失われます。')) {
-                    window.NewsData.reset();
-                    renderList();
-                    resetForm();
-                }
-            });
-        });
+        // 初期化
+        renderList();
     </script>
 </body>
 </html>
