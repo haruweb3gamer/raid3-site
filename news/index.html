@@ -4,6 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEWS - RAID3</title>
+    
+    <!-- ファビコン -->
+    <link rel="icon" href="../images/R3aicon.png" type="image/png">
+    <link rel="apple-touch-icon" href="../images/R3aicon.png">
+    
+    <!-- OGP -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="RAID3">
+    <meta property="og:title" content="NEWS - RAID3">
+    <meta property="og:description" content="RAID3の最新ニュース">
+    <meta property="og:image" content="https://raid3.vercel.app/images/R3aicon.png">
+    <meta property="og:url" content="https://raid3.vercel.app/news/">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@raid3__">
+    <meta name="twitter:title" content="NEWS - RAID3">
+    <meta name="twitter:description" content="RAID3の最新ニュース">
+    <meta name="twitter:image" content="https://raid3.vercel.app/images/R3aicon.png">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -19,7 +39,7 @@
             </svg>
         </a>
         <ul class="nav-links">
-            <li><a href="../news/index.html">News</a></li>
+            <li><a href="index.html">News</a></li>
             <li><a href="../index.html#creators">Creators</a></li>
             <li><a href="../index.html#about">About</a></li>
             <li><a href="https://suzuri.jp/RAID3" target="_blank">Store</a></li>
@@ -61,7 +81,8 @@
 
         function buildFilters() {
             filterTags.innerHTML = '';
-            window.NewsData.TAGS.forEach(tag => {
+            if (!window.NewsData || !window.NewsData.TAGS) return;
+            Object.values(window.NewsData.TAGS).forEach(tag => {
                 const label = document.createElement('label');
                 label.className = 'filter-tag';
                 const input = document.createElement('input');
@@ -72,6 +93,15 @@
                 label.appendChild(document.createTextNode(`#${tag}`));
                 filterTags.appendChild(label);
             });
+        }
+
+        // 画像パスを調整（news/フォルダからimages/フォルダへ）
+        function adjustImagePath(path) {
+            if (!path) return '';
+            if (path.startsWith('../')) return path;
+            if (path.startsWith('http://') || path.startsWith('https://')) return path;
+            if (path.startsWith('images/')) return '../' + path;
+            return '../' + path;
         }
 
         function renderList() {
@@ -98,13 +128,13 @@
             items.forEach(item => {
                 const card = document.createElement('a');
                 card.className = 'news-card news-card-list reveal';
-                card.href = `article.html?id=${item.id}`;
+                card.href = `${item.id}.html`;
 
                 const image = document.createElement('div');
                 image.className = 'news-card-image';
                 if (item.thumbnail) {
                     const img = document.createElement('img');
-                    img.src = item.thumbnail;
+                    img.src = adjustImagePath(item.thumbnail);
                     img.alt = item.title;
                     image.appendChild(img);
                 } else {
@@ -157,4 +187,3 @@
     </script>
 </body>
 </html>
-

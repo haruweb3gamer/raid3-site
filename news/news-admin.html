@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEWS管理 - RAID3</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #fff; padding: 2rem; }
         h1 { font-size: 2rem; margin-bottom: 1rem; }
         h2 { font-size: 1.3rem; margin: 2rem 0 1rem; border-bottom: 1px solid #333; padding-bottom: 0.5rem; }
         
+        /* エクスポートセクション */
         .export-section {
             background: linear-gradient(135deg, #1a2a1a 0%, #0a1a0a 100%);
             border: 2px solid #4ade80;
@@ -17,53 +19,28 @@
             padding: 1.5rem;
             margin-bottom: 2rem;
         }
-        .export-section h2 {
-            color: #4ade80;
-            border: none;
-            margin: 0 0 1rem 0;
-            padding: 0;
-        }
-        .export-buttons {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-bottom: 1rem;
-        }
+        .export-section h2 { color: #4ade80; border: none; margin: 0 0 1rem 0; padding: 0; }
+        .export-buttons { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
         .export-btn {
-            background: #4ade80;
-            color: #000;
-            border: none;
-            padding: 1rem 2rem;
-            font-size: 1.1rem;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            background: #4ade80; color: #000; border: none; padding: 1rem 2rem;
+            font-size: 1.1rem; font-weight: bold; border-radius: 8px; cursor: pointer;
         }
         .export-btn:hover { background: #22c55e; }
-        .export-btn.secondary {
-            background: #3b82f6;
-            color: #fff;
-        }
-        .export-btn.secondary:hover { background: #2563eb; }
-        .export-info {
-            font-size: 0.85rem;
-            color: #9ca3af;
-            line-height: 1.6;
-        }
+        .export-btn:disabled { background: #666; cursor: not-allowed; }
+        .export-info { font-size: 0.85rem; color: #9ca3af; line-height: 1.6; }
         .export-info strong { color: #4ade80; }
 
+        /* フォーム */
         .news-form { background: #1a1a1a; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; }
         .form-row { margin-bottom: 1rem; }
+        .form-row-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
         label { display: block; margin-bottom: 0.3rem; font-weight: 500; color: #9ca3af; }
         input, textarea, select { 
             width: 100%; padding: 0.75rem; background: #2a2a2a; border: 1px solid #444; 
             border-radius: 4px; color: #fff; font-size: 1rem; 
         }
         input:focus, textarea:focus { outline: none; border-color: #4ade80; }
-        textarea { min-height: 200px; font-family: monospace; }
+        textarea { min-height: 150px; font-family: monospace; }
         .btn { 
             background: #4ade80; color: #000; border: none; padding: 0.75rem 1.5rem; 
             font-weight: bold; border-radius: 4px; cursor: pointer; margin-right: 0.5rem; 
@@ -72,98 +49,159 @@
         .btn-danger { background: #ef4444; color: #fff; }
         .btn-danger:hover { background: #dc2626; }
         .btn-secondary { background: #6b7280; color: #fff; }
+        .btn-preview { background: #3b82f6; color: #fff; }
+        .btn-preview:hover { background: #2563eb; }
 
-        .news-list { display: grid; gap: 1rem; }
-        .news-item { 
-            background: #1a1a1a; padding: 1rem; border-radius: 8px; 
-            display: flex; justify-content: space-between; align-items: center; 
+        /* 画像アップロード */
+        .image-upload-area {
+            border: 2px dashed #444; border-radius: 8px; padding: 2rem;
+            text-align: center; cursor: pointer; transition: all 0.3s;
+            margin-bottom: 1rem;
         }
-        .news-item-info h3 { font-size: 1rem; margin-bottom: 0.3rem; }
-        .news-item-info p { font-size: 0.8rem; color: #9ca3af; }
-        .news-item-actions { display: flex; gap: 0.5rem; }
-        .news-item-actions button { padding: 0.5rem 1rem; font-size: 0.85rem; }
+        .image-upload-area:hover, .image-upload-area.dragover {
+            border-color: #4ade80; background: rgba(74, 222, 128, 0.1);
+        }
+        .image-upload-area input { display: none; }
+        .image-upload-area p { color: #9ca3af; margin-bottom: 0.5rem; }
+        .image-upload-area .icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        .image-preview { max-width: 200px; max-height: 150px; margin-top: 1rem; border-radius: 4px; }
+        .image-name { font-size: 0.8rem; color: #4ade80; margin-top: 0.5rem; }
 
+        /* タグ */
         .tag-input-wrap { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
         .tag-badge { 
             background: #4ade80; color: #000; padding: 0.25rem 0.75rem; 
             border-radius: 999px; font-size: 0.8rem; display: flex; align-items: center; gap: 0.3rem; 
         }
         .tag-badge button { background: none; border: none; cursor: pointer; font-size: 1rem; line-height: 1; }
-        
         .help-text { font-size: 0.75rem; color: #6b7280; margin-top: 0.25rem; }
-        
-        .step-box {
-            background: #1a1a1a;
-            border-radius: 8px;
-            padding: 1rem;
-            margin-top: 1rem;
+
+        /* ニュース一覧 */
+        .news-list { display: grid; gap: 1rem; }
+        .news-item { 
+            background: #1a1a1a; padding: 1rem; border-radius: 8px; 
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 1rem;
         }
-        .step-box h4 {
-            color: #4ade80;
-            margin-bottom: 0.5rem;
+        .news-item-thumb { width: 80px; height: 60px; background: #2a2a2a; border-radius: 4px; overflow: hidden; flex-shrink: 0; }
+        .news-item-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .news-item-thumb .placeholder { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #666; font-weight: bold; }
+        .news-item-info { flex: 1; }
+        .news-item-info h3 { font-size: 1rem; margin-bottom: 0.3rem; }
+        .news-item-info p { font-size: 0.8rem; color: #9ca3af; }
+        .news-item-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
+        .news-item-actions button { padding: 0.5rem 1rem; font-size: 0.85rem; }
+
+        /* プレビューモーダル */
+        .modal-overlay {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 1000; overflow-y: auto;
         }
-        .step-box ol {
-            margin-left: 1.5rem;
-            color: #9ca3af;
-            line-height: 1.8;
+        .modal-overlay.active { display: block; }
+        .modal-content {
+            max-width: 800px; margin: 2rem auto; background: #111; border-radius: 12px;
+            overflow: hidden;
         }
-        .step-box code {
-            background: #2a2a2a;
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            font-size: 0.85rem;
+        .modal-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1rem; border-bottom: 1px solid #333;
         }
+        .modal-header h3 { font-size: 1.2rem; }
+        .modal-close { background: none; border: none; color: #fff; font-size: 2rem; cursor: pointer; }
+        .modal-body { padding: 0; }
+        .preview-frame { width: 100%; min-height: 600px; border: none; background: #0a0a0a; }
+
+        /* 画像管理 */
+        .image-manager { background: #1a1a1a; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; }
+        .image-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1rem; margin-top: 1rem; }
+        .image-item { 
+            background: #2a2a2a; border-radius: 8px; overflow: hidden; position: relative;
+            aspect-ratio: 1;
+        }
+        .image-item img { width: 100%; height: 100%; object-fit: cover; }
+        .image-item-info { 
+            position: absolute; bottom: 0; left: 0; right: 0; padding: 0.5rem;
+            background: linear-gradient(transparent, rgba(0,0,0,0.9));
+            font-size: 0.7rem; color: #ccc; word-break: break-all;
+        }
+        .image-item-delete {
+            position: absolute; top: 4px; right: 4px; background: #ef4444;
+            border: none; color: #fff; width: 24px; height: 24px; border-radius: 50%;
+            cursor: pointer; font-size: 1rem; line-height: 1;
+        }
+
+        /* ステータス */
+        .status-bar {
+            background: #1a1a1a; padding: 0.75rem 1rem; border-radius: 8px;
+            margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;
+        }
+        .status-bar .count { color: #4ade80; }
     </style>
 </head>
 <body>
     <h1>📰 NEWS管理ページ</h1>
 
+    <div class="status-bar">
+        <span>記事数: <strong class="count" id="newsCount">0</strong> | 画像数: <strong class="count" id="imageCount">0</strong></span>
+        <button class="btn btn-danger" onclick="clearAllData()" style="padding: 0.5rem 1rem; font-size: 0.85rem;">🗑️ 全データクリア</button>
+    </div>
+
     <!-- エクスポートセクション -->
     <div class="export-section">
-        <h2>📤 公開用ファイルをエクスポート</h2>
+        <h2>📤 一括エクスポート（GitHub用）</h2>
         <div class="export-buttons">
-            <button class="export-btn" onclick="exportNewsData()">
-                📥 news-data.js をダウンロード
-            </button>
-            <button class="export-btn secondary" onclick="exportAllArticles()">
-                📄 個別記事HTMLをダウンロード（OGP対応）
+            <button class="export-btn" onclick="exportZip()" id="exportZipBtn">
+                📦 ZIPでまとめてダウンロード
             </button>
         </div>
         <p class="export-info">
-            <strong>news-data.js</strong>：ニュースデータ本体。GitHubの <code>raid3-site/news-data.js</code> に上書き。<br>
-            <strong>個別記事HTML</strong>：Xシェア時にサムネイル画像を表示するためのファイル。各記事ごとにダウンロードされます。
+            <strong>ZIPファイルに含まれるもの：</strong><br>
+            ・news-data.js（ニュースデータ）<br>
+            ・news/001.html, 002.html...（個別記事HTML、OGP対応）<br>
+            ・images/（アップロードした画像）<br><br>
+            <strong>手順：</strong>ZIPをダウンロード → 解凍 → 中身をGitHubのraid3-siteにドラッグ&ドロップ → 完了！
         </p>
-        
-        <div class="step-box">
-            <h4>📝 公開手順</h4>
-            <ol>
-                <li>「news-data.js をダウンロード」→ GitHubの <code>news-data.js</code> に上書き</li>
-                <li>「個別記事HTMLをダウンロード」→ ダウンロードした <code>001.html</code>, <code>002.html</code>... を <code>news/</code> フォルダに追加</li>
-                <li>GitHubにプッシュ → Vercelが自動デプロイ（1〜2分）</li>
-                <li>Xでシェアするとサムネイル画像付きで表示される！</li>
-            </ol>
-        </div>
     </div>
 
+    <!-- 画像管理 -->
+    <div class="image-manager">
+        <h2 style="margin-top: 0;">🖼️ 画像管理</h2>
+        <div class="image-upload-area" id="globalImageUpload">
+            <div class="icon">📁</div>
+            <p>クリックまたはドラッグ&ドロップで画像を追加</p>
+            <p style="font-size: 0.8rem;">PNG, JPG, GIF, WebP対応</p>
+            <input type="file" id="globalImageInput" accept="image/*" multiple>
+        </div>
+        <div class="image-grid" id="imageGrid"></div>
+    </div>
+
+    <!-- ニュース編集 -->
     <h2>➕ ニュースを追加・編集</h2>
     <div class="news-form">
         <input type="hidden" id="editId">
-        <div class="form-row">
-            <label>ID（半角英数字、例: 001, 002）</label>
-            <input type="text" id="newsId" placeholder="001">
+        <div class="form-row-2col">
+            <div class="form-row">
+                <label>ID（半角英数字、例: 001）</label>
+                <input type="text" id="newsId" placeholder="001">
+            </div>
+            <div class="form-row">
+                <label>日付</label>
+                <input type="date" id="newsDate">
+            </div>
         </div>
         <div class="form-row">
             <label>タイトル</label>
             <input type="text" id="newsTitle" placeholder="記事タイトル">
         </div>
         <div class="form-row">
-            <label>日付</label>
-            <input type="date" id="newsDate">
-        </div>
-        <div class="form-row">
-            <label>サムネイル画像パス</label>
-            <input type="text" id="newsThumbnail" placeholder="images/news001.png">
-            <p class="help-text">※ images/ から始めてください（例: images/news001.png）</p>
+            <label>サムネイル画像</label>
+            <div class="image-upload-area" id="thumbnailUpload" style="padding: 1rem;">
+                <p>クリックして画像を選択、または上の画像管理から選んでファイル名を入力</p>
+                <input type="file" id="thumbnailInput" accept="image/*">
+                <img id="thumbnailPreview" class="image-preview" style="display: none;">
+                <p id="thumbnailName" class="image-name"></p>
+            </div>
+            <input type="text" id="newsThumbnail" placeholder="images/news001.png（直接入力も可）" style="margin-top: 0.5rem;">
         </div>
         <div class="form-row">
             <label>タグ（Enterで追加）</label>
@@ -175,16 +213,197 @@
             <textarea id="newsBody" placeholder="<p>記事の内容...</p>"></textarea>
         </div>
         <button class="btn" onclick="saveNews()">💾 保存</button>
+        <button class="btn btn-preview" onclick="previewNews()">👁️ プレビュー</button>
         <button class="btn btn-secondary" onclick="clearForm()">クリア</button>
     </div>
 
     <h2>📋 ニュース一覧</h2>
     <div class="news-list" id="newsList"></div>
 
-    <script src="news-data.js"></script>
+    <!-- プレビューモーダル -->
+    <div class="modal-overlay" id="previewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📱 プレビュー</h3>
+                <button class="modal-close" onclick="closePreview()">×</button>
+            </div>
+            <div class="modal-body">
+                <iframe id="previewFrame" class="preview-frame"></iframe>
+            </div>
+        </div>
+    </div>
+
     <script>
-        let currentTags = [];
+        // ==================== 定数・初期化 ====================
         const SITE_URL = 'https://raid3.vercel.app';
+        const DB_NAME = 'raid3_news_db';
+        const DB_VERSION = 1;
+        let db = null;
+        let currentTags = [];
+        let uploadedImages = {}; // { filename: base64data }
+
+        // IndexedDB初期化
+        async function initDB() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                request.onerror = () => reject(request.error);
+                request.onsuccess = () => { db = request.result; resolve(db); };
+                request.onupgradeneeded = (e) => {
+                    const database = e.target.result;
+                    if (!database.objectStoreNames.contains('images')) {
+                        database.createObjectStore('images', { keyPath: 'filename' });
+                    }
+                    if (!database.objectStoreNames.contains('news')) {
+                        database.createObjectStore('news', { keyPath: 'id' });
+                    }
+                };
+            });
+        }
+
+        // ==================== 画像管理 ====================
+        async function saveImage(filename, data) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction('images', 'readwrite');
+                tx.objectStore('images').put({ filename, data, timestamp: Date.now() });
+                tx.oncomplete = () => { uploadedImages[filename] = data; resolve(); };
+                tx.onerror = () => reject(tx.error);
+            });
+        }
+
+        async function loadAllImages() {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction('images', 'readonly');
+                const request = tx.objectStore('images').getAll();
+                request.onsuccess = () => {
+                    uploadedImages = {};
+                    request.result.forEach(img => { uploadedImages[img.filename] = img.data; });
+                    resolve(uploadedImages);
+                };
+                request.onerror = () => reject(request.error);
+            });
+        }
+
+        async function deleteImage(filename) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction('images', 'readwrite');
+                tx.objectStore('images').delete(filename);
+                tx.oncomplete = () => { delete uploadedImages[filename]; resolve(); };
+                tx.onerror = () => reject(tx.error);
+            });
+        }
+
+        function renderImageGrid() {
+            const grid = document.getElementById('imageGrid');
+            const filenames = Object.keys(uploadedImages);
+            document.getElementById('imageCount').textContent = filenames.length;
+            
+            if (!filenames.length) {
+                grid.innerHTML = '<p style="color:#666; grid-column: 1/-1;">画像がありません</p>';
+                return;
+            }
+            grid.innerHTML = filenames.map(filename => `
+                <div class="image-item">
+                    <img src="${uploadedImages[filename]}" alt="${filename}">
+                    <div class="image-item-info">${filename}</div>
+                    <button class="image-item-delete" onclick="handleDeleteImage('${filename}')">×</button>
+                </div>
+            `).join('');
+        }
+
+        async function handleDeleteImage(filename) {
+            if (confirm(`${filename} を削除しますか？`)) {
+                await deleteImage(filename);
+                renderImageGrid();
+            }
+        }
+
+        function handleImageUpload(files, targetInput = null) {
+            Array.from(files).forEach(file => {
+                if (!file.type.startsWith('image/')) return;
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    const filename = file.name;
+                    await saveImage(filename, e.target.result);
+                    renderImageGrid();
+                    
+                    if (targetInput) {
+                        document.getElementById('newsThumbnail').value = `images/${filename}`;
+                        document.getElementById('thumbnailPreview').src = e.target.result;
+                        document.getElementById('thumbnailPreview').style.display = 'block';
+                        document.getElementById('thumbnailName').textContent = filename;
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // グローバル画像アップロード
+        const globalUpload = document.getElementById('globalImageUpload');
+        const globalInput = document.getElementById('globalImageInput');
+        globalUpload.addEventListener('click', () => globalInput.click());
+        globalUpload.addEventListener('dragover', (e) => { e.preventDefault(); globalUpload.classList.add('dragover'); });
+        globalUpload.addEventListener('dragleave', () => globalUpload.classList.remove('dragover'));
+        globalUpload.addEventListener('drop', (e) => {
+            e.preventDefault();
+            globalUpload.classList.remove('dragover');
+            handleImageUpload(e.dataTransfer.files);
+        });
+        globalInput.addEventListener('change', (e) => handleImageUpload(e.target.files));
+
+        // サムネイル画像アップロード
+        const thumbUpload = document.getElementById('thumbnailUpload');
+        const thumbInput = document.getElementById('thumbnailInput');
+        thumbUpload.addEventListener('click', () => thumbInput.click());
+        thumbInput.addEventListener('change', (e) => handleImageUpload(e.target.files, true));
+
+        // ==================== ニュース管理 ====================
+        function getNews() {
+            try {
+                const stored = localStorage.getItem('raid3_news_admin');
+                return stored ? JSON.parse(stored) : [];
+            } catch (e) { return []; }
+        }
+
+        function saveNewsToStorage(news) {
+            localStorage.setItem('raid3_news_admin', JSON.stringify(news));
+        }
+
+        function renderList() {
+            const list = document.getElementById('newsList');
+            const items = getNews();
+            document.getElementById('newsCount').textContent = items.length;
+            
+            if (!items.length) {
+                list.innerHTML = '<p style="color:#666;">ニュースがありません</p>';
+                return;
+            }
+            list.innerHTML = items.map(item => {
+                const thumbSrc = item.thumbnail ? getImageSrc(item.thumbnail) : null;
+                return `
+                <div class="news-item">
+                    <div class="news-item-thumb">
+                        ${thumbSrc ? `<img src="${thumbSrc}" alt="">` : '<div class="placeholder">R3</div>'}
+                    </div>
+                    <div class="news-item-info">
+                        <h3>${escapeHtml(item.title)}</h3>
+                        <p>ID: ${item.id} | ${item.date || '日付なし'} | タグ: ${(item.tags||[]).join(', ') || 'なし'}</p>
+                    </div>
+                    <div class="news-item-actions">
+                        <button class="btn btn-preview" onclick="previewNewsById('${item.id}')">👁️</button>
+                        <button class="btn" onclick="editNews('${item.id}')">編集</button>
+                        <button class="btn btn-danger" onclick="deleteNews('${item.id}')">削除</button>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        function getImageSrc(path) {
+            if (!path) return null;
+            const filename = path.replace(/^(\.\.\/)?images\//, '');
+            if (uploadedImages[filename]) return uploadedImages[filename];
+            if (path.startsWith('http')) return path;
+            return null;
+        }
 
         // タグ入力
         document.getElementById('tagInput').addEventListener('keydown', function(e) {
@@ -200,36 +419,14 @@
         });
 
         function renderTags() {
-            const container = document.getElementById('tagList');
-            container.innerHTML = currentTags.map((tag, i) => 
-                `<span class="tag-badge">#${tag} <button onclick="removeTag(${i})">×</button></span>`
+            document.getElementById('tagList').innerHTML = currentTags.map((tag, i) => 
+                `<span class="tag-badge">#${escapeHtml(tag)} <button onclick="removeTag(${i})">×</button></span>`
             ).join('');
         }
 
         function removeTag(index) {
             currentTags.splice(index, 1);
             renderTags();
-        }
-
-        function renderList() {
-            const list = document.getElementById('newsList');
-            const items = window.NewsData.getAll();
-            if (!items.length) {
-                list.innerHTML = '<p style="color:#666;">ニュースがありません</p>';
-                return;
-            }
-            list.innerHTML = items.map(item => `
-                <div class="news-item">
-                    <div class="news-item-info">
-                        <h3>${item.title}</h3>
-                        <p>ID: ${item.id} | ${item.date || '日付なし'} | タグ: ${(item.tags||[]).join(', ') || 'なし'}</p>
-                    </div>
-                    <div class="news-item-actions">
-                        <button class="btn" onclick="editNews('${item.id}')">編集</button>
-                        <button class="btn btn-danger" onclick="deleteNews('${item.id}')">削除</button>
-                    </div>
-                </div>
-            `).join('');
         }
 
         function saveNews() {
@@ -239,25 +436,27 @@
             const thumbnail = document.getElementById('newsThumbnail').value.trim();
             const body = document.getElementById('newsBody').value;
 
-            if (!id || !title) {
-                alert('IDとタイトルは必須です');
-                return;
-            }
+            if (!id || !title) { alert('IDとタイトルは必須です'); return; }
 
+            const news = getNews();
             const editId = document.getElementById('editId').value;
+            const newItem = { id, title, date, thumbnail, tags: [...currentTags], body };
             
             if (editId) {
-                window.NewsData.update(editId, { id, title, date, thumbnail, tags: currentTags, body });
+                const index = news.findIndex(n => n.id === editId);
+                if (index !== -1) news[index] = newItem;
             } else {
-                window.NewsData.add({ id, title, date, thumbnail, tags: currentTags, body });
+                if (news.some(n => n.id === id)) { alert('このIDは既に使われています'); return; }
+                news.unshift(newItem);
             }
 
+            saveNewsToStorage(news);
             clearForm();
             renderList();
         }
 
         function editNews(id) {
-            const item = window.NewsData.getById(id);
+            const item = getNews().find(n => n.id === id);
             if (!item) return;
             document.getElementById('editId').value = id;
             document.getElementById('newsId').value = item.id;
@@ -267,12 +466,20 @@
             document.getElementById('newsBody').value = item.body || '';
             currentTags = [...(item.tags || [])];
             renderTags();
+            
+            const thumbSrc = getImageSrc(item.thumbnail);
+            if (thumbSrc) {
+                document.getElementById('thumbnailPreview').src = thumbSrc;
+                document.getElementById('thumbnailPreview').style.display = 'block';
+            }
+            
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function deleteNews(id) {
             if (confirm('削除しますか？')) {
-                window.NewsData.remove(id);
+                const news = getNews().filter(n => n.id !== id);
+                saveNewsToStorage(news);
                 renderList();
             }
         }
@@ -284,213 +491,230 @@
             document.getElementById('newsDate').value = '';
             document.getElementById('newsThumbnail').value = '';
             document.getElementById('newsBody').value = '';
+            document.getElementById('thumbnailPreview').style.display = 'none';
+            document.getElementById('thumbnailName').textContent = '';
             currentTags = [];
             renderTags();
         }
 
-        // news-data.js エクスポート
-        function exportNewsData() {
-            const items = window.NewsData.getAll();
-            const jsContent = `// RAID3 News Data - Generated ${new Date().toISOString()}
+        function clearAllData() {
+            if (confirm('すべてのニュースと画像を削除しますか？この操作は取り消せません。')) {
+                localStorage.removeItem('raid3_news_admin');
+                indexedDB.deleteDatabase(DB_NAME);
+                uploadedImages = {};
+                location.reload();
+            }
+        }
+
+        // ==================== プレビュー ====================
+        function previewNews() {
+            const item = {
+                id: document.getElementById('newsId').value.trim() || 'preview',
+                title: document.getElementById('newsTitle').value.trim() || 'プレビュー',
+                date: document.getElementById('newsDate').value,
+                thumbnail: document.getElementById('newsThumbnail').value.trim(),
+                tags: [...currentTags],
+                body: document.getElementById('newsBody').value
+            };
+            showPreview(item);
+        }
+
+        function previewNewsById(id) {
+            const item = getNews().find(n => n.id === id);
+            if (item) showPreview(item);
+        }
+
+        function showPreview(item) {
+            const html = generatePreviewHTML(item);
+            const frame = document.getElementById('previewFrame');
+            frame.srcdoc = html;
+            document.getElementById('previewModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePreview() {
+            document.getElementById('previewModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        function generatePreviewHTML(item) {
+            const thumbSrc = getImageSrc(item.thumbnail) || '';
+            return `<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #fff; padding: 2rem; line-height: 1.6; }
+.tags { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.tag { background: rgba(74,222,128,0.2); color: #4ade80; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.8rem; }
+h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+.date { color: #666; font-size: 0.9rem; margin-bottom: 2rem; }
+.image { width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 2rem; }
+.placeholder { width: 100%; height: 200px; background: #1a1a1a; display: flex; align-items: center; justify-content: center; border-radius: 8px; margin-bottom: 2rem; color: #333; font-size: 3rem; font-weight: bold; }
+.body { font-size: 1rem; }
+.body p { margin-bottom: 1rem; }
+</style>
+</head><body>
+<div class="tags">${(item.tags || []).map(t => `<span class="tag">#${escapeHtml(t)}</span>`).join('')}</div>
+<h1>${escapeHtml(item.title)}</h1>
+<p class="date">${item.date || ''}</p>
+${thumbSrc ? `<img class="image" src="${thumbSrc}">` : '<div class="placeholder">R3</div>'}
+<div class="body">${item.body || '<p>本文がありません</p>'}</div>
+</body></html>`;
+        }
+
+        // モーダル外クリックで閉じる
+        document.getElementById('previewModal').addEventListener('click', (e) => {
+            if (e.target.id === 'previewModal') closePreview();
+        });
+
+        // ==================== エクスポート ====================
+        async function exportZip() {
+            const btn = document.getElementById('exportZipBtn');
+            btn.disabled = true;
+            btn.textContent = '⏳ 作成中...';
+
+            try {
+                const zip = new JSZip();
+                const news = getNews();
+
+                // news-data.js
+                const newsDataJs = generateNewsDataJS(news);
+                zip.file('news-data.js', newsDataJs);
+
+                // 個別記事HTML
+                const newsFolder = zip.folder('news');
+                news.forEach(item => {
+                    const html = generateArticleHTML(item);
+                    newsFolder.file(`${item.id}.html`, html);
+                });
+
+                // 画像
+                const imgFolder = zip.folder('images');
+                for (const [filename, data] of Object.entries(uploadedImages)) {
+                    const base64 = data.split(',')[1];
+                    imgFolder.file(filename, base64, { base64: true });
+                }
+
+                // ZIPダウンロード
+                const blob = await zip.generateAsync({ type: 'blob' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `raid3-news-${new Date().toISOString().slice(0,10)}.zip`;
+                a.click();
+                URL.revokeObjectURL(url);
+
+                alert(`ZIPファイルを作成しました！\n\n含まれるファイル:\n・news-data.js\n・news/${news.map(n=>n.id+'.html').join(', ')}\n・images/${Object.keys(uploadedImages).join(', ') || 'なし'}\n\n解凍してGitHubにアップロードしてください。`);
+            } catch (e) {
+                console.error(e);
+                alert('エラーが発生しました: ' + e.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '📦 ZIPでまとめてダウンロード';
+            }
+        }
+
+        function generateNewsDataJS(news) {
+            return `// RAID3 News Data - Generated ${new Date().toISOString()}
 (function() {
-    const defaultNews = ${JSON.stringify(items, null, 2)};
-
-    const TAGS = {
-        INFO: 'お知らせ',
-        EVENT: 'イベント',
-        MEMBER: 'メンバー',
-        COLLAB: 'コラボ',
-        MEDIA: 'メディア'
-    };
-
-    function getStoredNews() {
-        try {
-            const stored = localStorage.getItem('raid3_news');
-            return stored ? JSON.parse(stored) : null;
-        } catch (e) {
-            return null;
-        }
-    }
-
-    function saveNews(news) {
-        try {
-            localStorage.setItem('raid3_news', JSON.stringify(news));
-        } catch (e) {
-            console.error('Failed to save news:', e);
-        }
-    }
-
-    function getNews() {
-        return getStoredNews() || defaultNews;
-    }
-
+    const defaultNews = ${JSON.stringify(news, null, 2)};
+    const TAGS = { INFO: 'お知らせ', EVENT: 'イベント', MEMBER: 'メンバー', COLLAB: 'コラボ', MEDIA: 'メディア' };
+    function getStoredNews() { try { const s = localStorage.getItem('raid3_news'); return s ? JSON.parse(s) : null; } catch(e) { return null; } }
+    function saveNews(n) { try { localStorage.setItem('raid3_news', JSON.stringify(n)); } catch(e) {} }
+    function getNews() { return getStoredNews() || defaultNews; }
     window.NewsData = {
         getAll: function() { return getNews(); },
         getById: function(id) { return getNews().find(n => n.id === id); },
-        add: function(item) {
-            const news = getNews();
-            news.unshift(item);
-            saveNews(news);
-        },
-        update: function(id, updates) {
-            const news = getNews();
-            const index = news.findIndex(n => n.id === id);
-            if (index !== -1) {
-                if (updates.id && updates.id !== id) {
-                    news[index] = { ...news[index], ...updates };
-                } else {
-                    news[index] = { ...news[index], ...updates };
-                }
-                saveNews(news);
-            }
-        },
-        remove: function(id) {
-            const news = getNews().filter(n => n.id !== id);
-            saveNews(news);
-        },
-        reset: function() {
-            localStorage.removeItem('raid3_news');
-        },
+        add: function(item) { const n = getNews(); n.unshift(item); saveNews(n); },
+        update: function(id, u) { const n = getNews(); const i = n.findIndex(x => x.id === id); if(i !== -1) { n[i] = {...n[i], ...u}; saveNews(n); } },
+        remove: function(id) { saveNews(getNews().filter(n => n.id !== id)); },
+        reset: function() { localStorage.removeItem('raid3_news'); },
         TAGS: TAGS
     };
 })();`;
-
-            downloadFile('news-data.js', jsContent);
-            alert('news-data.js をダウンロードしました！\n\nGitHubの raid3-site/news-data.js に上書きしてください。');
-        }
-
-        // 個別記事HTMLエクスポート
-        function exportAllArticles() {
-            const items = window.NewsData.getAll();
-            if (!items.length) {
-                alert('ニュースがありません');
-                return;
-            }
-
-            items.forEach(item => {
-                const html = generateArticleHTML(item);
-                downloadFile(`${item.id}.html`, html);
-            });
-
-            alert(`${items.length}件の記事HTMLをダウンロードしました！\n\nGitHubの raid3-site/news/ フォルダに追加してください。`);
         }
 
         function generateArticleHTML(item) {
-            // サムネイルURLを生成（フルURL）
-            let ogImage = `${SITE_URL}/images/R3aicon.png`; // デフォルト
+            let ogImage = `${SITE_URL}/images/R3aicon.png`;
             if (item.thumbnail) {
-                if (item.thumbnail.startsWith('http')) {
-                    ogImage = item.thumbnail;
-                } else if (item.thumbnail.startsWith('images/')) {
-                    ogImage = `${SITE_URL}/${item.thumbnail}`;
-                } else {
-                    ogImage = `${SITE_URL}/images/${item.thumbnail}`;
-                }
+                if (item.thumbnail.startsWith('http')) ogImage = item.thumbnail;
+                else if (item.thumbnail.startsWith('images/')) ogImage = `${SITE_URL}/${item.thumbnail}`;
+                else ogImage = `${SITE_URL}/images/${item.thumbnail}`;
             }
-
             const articleUrl = `${SITE_URL}/news/${item.id}.html`;
             const title = escapeHtml(item.title);
-            const description = item.body ? escapeHtml(item.body.replace(/<[^>]*>/g, '').substring(0, 100)) : 'RAID3 - Web3 Gaming is Inevitable';
+            const desc = item.body ? escapeHtml(item.body.replace(/<[^>]*>/g, '').substring(0, 100)) : 'RAID3 - Web3 Gaming is Inevitable';
 
             return `<!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${title} - RAID3</title>
-    
-    <!-- ファビコン -->
-    <link rel="icon" href="../images/R3aicon.png" type="image/png">
-    <link rel="apple-touch-icon" href="../images/R3aicon.png">
-    
-    <!-- OGP（Xシェア用） -->
-    <meta property="og:type" content="article">
-    <meta property="og:site_name" content="RAID3">
-    <meta property="og:title" content="${title} - RAID3">
-    <meta property="og:description" content="${description}">
-    <meta property="og:image" content="${ogImage}">
-    <meta property="og:url" content="${articleUrl}">
-    
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:site" content="@raid3__">
-    <meta name="twitter:title" content="${title} - RAID3">
-    <meta name="twitter:description" content="${description}">
-    <meta name="twitter:image" content="${ogImage}">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../styles.css">
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>${title} - RAID3</title>
+<link rel="icon" href="../images/R3aicon.png" type="image/png">
+<link rel="apple-touch-icon" href="../images/R3aicon.png">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="RAID3">
+<meta property="og:title" content="${title} - RAID3">
+<meta property="og:description" content="${desc}">
+<meta property="og:image" content="${ogImage}">
+<meta property="og:url" content="${articleUrl}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@raid3__">
+<meta name="twitter:title" content="${title} - RAID3">
+<meta name="twitter:description" content="${desc}">
+<meta name="twitter:image" content="${ogImage}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles.css">
 </head>
 <body>
-    <nav id="navbar">
-        <a href="../index.html">
-            <svg class="logo-svg" viewBox="0 0 726.3667 231.57715" xmlns="http://www.w3.org/2000/svg">
-                <g transform="translate(-412,-327.5)">
-                    <path fill="#ffffff" d="M 412,445 V 331 l 36.25,0.0195 c 39.70236,0.0214 52.44438,1.06623 64.61382,5.29835 21.50077,7.47722 35.03722,21.82265 40.74698,43.18213 2.91852,10.91777 2.6945,37.05288 -0.41515,48.43317 -6.82921,24.99271 -21.25152,41.90747 -42.19972,49.49263 -3.15061,1.14081 -5.83977,2.44977 -5.9759,2.90879 -0.13613,0.45903 12.51617,17.97453 28.11623,38.92335 15.60006,20.94881 28.51634,38.46855 28.70286,38.93276 0.18652,0.46421 -11.02435,0.72371 -24.91303,0.57666 L 511.67393,558.5 482.58697,517.5553 453.5,476.61061 453.23891,517.8053 452.97781,559 H 432.48891 412 Z m 68.20078,9.87562 c 12.15861,-2.57979 22.56871,-10.69363 28.22437,-21.99863 4.70642,-9.40757 5.89723,-16.06687 5.33639,-29.84222 -0.60389,-14.83252 -2.93334,-21.36434 -10.16533,-28.50378 -7.94303,-7.84138 -14.14884,-9.70079 -34.34621,-10.29097 L 453,363.76518 V 409.88259 456 h 10.95078 c 6.02293,0 13.33543,-0.50597 16.25,-1.12438 z M 568,558.24755 c 0,-0.4345 21.53555,-52.53045 47.85679,-115.76878 C 653.4108,352.25302 664.08802,327.5 665.45292,327.5 c 1.36368,0 11.98218,24.51367 49.1644,113.5 26.08378,62.425 47.6893,114.5125 48.01228,115.75 l 0.58722,2.25 H 741.29431 719.3718 l -6.31169,-16.5 -6.31169,-16.5 h -40.7915 -40.7915 l -1.5893,4.25 c -0.87411,2.3375 -3.55789,9.65 -5.96396,16.25 l -4.37466,12 -22.61875,0.26877 C 578.17844,558.9166 568,558.68205 568,558.24755 Z m 126,-64.80929 c 0,-0.30895 -5.36581,-14.59645 -11.92402,-31.75 -6.55821,-17.15354 -12.94832,-34.67564 -14.20026,-38.938 -1.25193,-4.26236 -2.59245,-7.41236 -2.97894,-7 -0.38649,0.41236 -1.69494,4.32651 -2.90766,8.69812 -1.21273,4.37161 -6.70328,20.12161 -12.20123,35 -5.49796,14.87839 -10.60443,28.73912 -11.34773,30.80162 l -1.35144,3.75 h 28.45564 C 681.19496,494 694,493.74722 694,493.43826 Z M 785,445 V 331 H 805.5 826 V 445 559 H 805.5 785 Z m 94.66667,113.33333 C 879.3,557.96667 879,506.62667 879,444.24445 V 330.82224 l 39.25,0.46751 c 41.28404,0.49174 45.57029,0.90035 60.71135,5.78763 31.34345,10.11713 51.21355,33.74637 59.21915,70.42262 2.8755,13.17355 3.6376,45.10965 1.4335,60.07259 -7.6233,51.75283 -36.7642,83.38026 -82.86316,89.93354 -10.62663,1.51065 -75.70239,2.20899 -77.08417,0.8272 z m 75.20237,-37.77058 c 19.71864,-5.30527 34.23089,-21.54403 40.115,-44.88745 6.49416,-25.76352 4.92088,-55.48052 -4.06216,-76.72937 C 980.43795,374.14679 964.00903,364 934.34004,364 H 922 v 79.65555 79.65555 l 13.75,-0.65191 c 7.5625,-0.35855 16.16607,-1.30194 19.11904,-2.09644 z M 1087.112,471.81347 c -6.7863,-0.76753 -18.2936,-5.73109 -23.4478,-10.11397 l -2.8357,-2.41141 4.5674,-7.12575 4.5675,-7.12574 5.5539,3.89049 c 12.3712,8.66607 27.4686,7.68657 36.2845,-2.35408 3.2104,-3.65651 5.9582,-11.06146 6.1982,-16.81169 0.3377,-8.08947 -5.1381,-17.55691 -12.4293,-20.86851 -4.6493,-2.11166 -15.756,-2.52439 -21.9145,-0.81434 -2.114,0.58703 -4.0803,0.83072 -4.3695,0.54153 -0.2892,-0.28918 5.359,-9.65948 12.5514,-20.82289 L 1104.9154,367.5 1086.7077,367 1068.5,366.5 l -0.2889,-8.75 -0.289,-8.75 32.098,0.19715 c 25.3881,0.15593 31.9502,-0.5273 31.3913,0.46141 -0.3887,0.6875 -6.4902,11.12482 -13.559,22.47117 -7.0688,11.34635 -12.8524,20.87156 -12.8524,21.16714 0,0.29557 2.2649,1.02313 5.033,1.61679 10.5431,2.2611 17.3498,8.63299 22.6769,16.90474 3.0945,4.80496 5.5,12.03856 5.6486,18.47733 0.1453,6.29408 -1.6551,13.69269 -4.6825,18.29764 -10.3437,15.73344 -26.0616,25.53892 -46.564,23.2201 z"/>
-                </g>
-            </svg>
-        </a>
-        <ul class="nav-links">
-            <li><a href="index.html">News</a></li>
-            <li><a href="../index.html#creators">Creators</a></li>
-            <li><a href="../index.html#about">About</a></li>
-            <li><a href="https://suzuri.jp/RAID3" target="_blank">Store</a></li>
-        </ul>
-    </nav>
-
-    <article class="news-article">
-        <header class="news-article-header">
-            <a href="index.html" class="news-article-back">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-                Back to News
-            </a>
-            <div class="news-article-tags">${(item.tags || []).map(t => `<span class="news-tag">#${escapeHtml(t)}</span>`).join('')}</div>
-            <h1 class="news-article-title">${title}</h1>
-            <p class="news-article-date">${item.date || ''}</p>
-        </header>
-
-        <div class="news-article-image">${item.thumbnail ? `<img src="../${item.thumbnail}" alt="${title}">` : '<div class="news-card-placeholder">R3</div>'}</div>
-        <div class="news-article-body">${item.body || '<p>本文が準備中です。</p>'}</div>
-
-        <div class="news-article-share">
-            <p>Share</p>
-            <div class="share-buttons">
-                <a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(articleUrl)}&text=${encodeURIComponent(item.title + ' | RAID3')}" target="_blank" class="share-btn">
-                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                </a>
-            </div>
-        </div>
-    </article>
-
-    <footer style="text-align: center; padding: 2rem; border-top: 1px solid #2a2a2a;">
-        <p style="font-size: 0.7rem; color: #666;">&copy; 2025 RAID3. All rights reserved.</p>
-    </footer>
-</body>
-</html>`;
+<nav id="navbar">
+<a href="../index.html">
+<svg class="logo-svg" viewBox="0 0 726.3667 231.57715" xmlns="http://www.w3.org/2000/svg"><g transform="translate(-412,-327.5)"><path fill="#ffffff" d="M 412,445 V 331 l 36.25,0.0195 c 39.70236,0.0214 52.44438,1.06623 64.61382,5.29835 21.50077,7.47722 35.03722,21.82265 40.74698,43.18213 2.91852,10.91777 2.6945,37.05288 -0.41515,48.43317 -6.82921,24.99271 -21.25152,41.90747 -42.19972,49.49263 -3.15061,1.14081 -5.83977,2.44977 -5.9759,2.90879 -0.13613,0.45903 12.51617,17.97453 28.11623,38.92335 15.60006,20.94881 28.51634,38.46855 28.70286,38.93276 0.18652,0.46421 -11.02435,0.72371 -24.91303,0.57666 L 511.67393,558.5 482.58697,517.5553 453.5,476.61061 453.23891,517.8053 452.97781,559 H 432.48891 412 Z m 68.20078,9.87562 c 12.15861,-2.57979 22.56871,-10.69363 28.22437,-21.99863 4.70642,-9.40757 5.89723,-16.06687 5.33639,-29.84222 -0.60389,-14.83252 -2.93334,-21.36434 -10.16533,-28.50378 -7.94303,-7.84138 -14.14884,-9.70079 -34.34621,-10.29097 L 453,363.76518 V 409.88259 456 h 10.95078 c 6.02293,0 13.33543,-0.50597 16.25,-1.12438 z M 568,558.24755 c 0,-0.4345 21.53555,-52.53045 47.85679,-115.76878 C 653.4108,352.25302 664.08802,327.5 665.45292,327.5 c 1.36368,0 11.98218,24.51367 49.1644,113.5 26.08378,62.425 47.6893,114.5125 48.01228,115.75 l 0.58722,2.25 H 741.29431 719.3718 l -6.31169,-16.5 -6.31169,-16.5 h -40.7915 -40.7915 l -1.5893,4.25 c -0.87411,2.3375 -3.55789,9.65 -5.96396,16.25 l -4.37466,12 -22.61875,0.26877 C 578.17844,558.9166 568,558.68205 568,558.24755 Z m 126,-64.80929 c 0,-0.30895 -5.36581,-14.59645 -11.92402,-31.75 -6.55821,-17.15354 -12.94832,-34.67564 -14.20026,-38.938 -1.25193,-4.26236 -2.59245,-7.41236 -2.97894,-7 -0.38649,0.41236 -1.69494,4.32651 -2.90766,8.69812 -1.21273,4.37161 -6.70328,20.12161 -12.20123,35 -5.49796,14.87839 -10.60443,28.73912 -11.34773,30.80162 l -1.35144,3.75 h 28.45564 C 681.19496,494 694,493.74722 694,493.43826 Z M 785,445 V 331 H 805.5 826 V 445 559 H 805.5 785 Z m 94.66667,113.33333 C 879.3,557.96667 879,506.62667 879,444.24445 V 330.82224 l 39.25,0.46751 c 41.28404,0.49174 45.57029,0.90035 60.71135,5.78763 31.34345,10.11713 51.21355,33.74637 59.21915,70.42262 2.8755,13.17355 3.6376,45.10965 1.4335,60.07259 -7.6233,51.75283 -36.7642,83.38026 -82.86316,89.93354 -10.62663,1.51065 -75.70239,2.20899 -77.08417,0.8272 z m 75.20237,-37.77058 c 19.71864,-5.30527 34.23089,-21.54403 40.115,-44.88745 6.49416,-25.76352 4.92088,-55.48052 -4.06216,-76.72937 C 980.43795,374.14679 964.00903,364 934.34004,364 H 922 v 79.65555 79.65555 l 13.75,-0.65191 c 7.5625,-0.35855 16.16607,-1.30194 19.11904,-2.09644 z M 1087.112,471.81347 c -6.7863,-0.76753 -18.2936,-5.73109 -23.4478,-10.11397 l -2.8357,-2.41141 4.5674,-7.12575 4.5675,-7.12574 5.5539,3.89049 c 12.3712,8.66607 27.4686,7.68657 36.2845,-2.35408 3.2104,-3.65651 5.9582,-11.06146 6.1982,-16.81169 0.3377,-8.08947 -5.1381,-17.55691 -12.4293,-20.86851 -4.6493,-2.11166 -15.756,-2.52439 -21.9145,-0.81434 -2.114,0.58703 -4.0803,0.83072 -4.3695,0.54153 -0.2892,-0.28918 5.359,-9.65948 12.5514,-20.82289 L 1104.9154,367.5 1086.7077,367 1068.5,366.5 l -0.2889,-8.75 -0.289,-8.75 32.098,0.19715 c 25.3881,0.15593 31.9502,-0.5273 31.3913,0.46141 -0.3887,0.6875 -6.4902,11.12482 -13.559,22.47117 -7.0688,11.34635 -12.8524,20.87156 -12.8524,21.16714 0,0.29557 2.2649,1.02313 5.033,1.61679 10.5431,2.2611 17.3498,8.63299 22.6769,16.90474 3.0945,4.80496 5.5,12.03856 5.6486,18.47733 0.1453,6.29408 -1.6551,13.69269 -4.6825,18.29764 -10.3437,15.73344 -26.0616,25.53892 -46.564,23.2201 z"/></g></svg>
+</a>
+<ul class="nav-links">
+<li><a href="index.html">News</a></li>
+<li><a href="../index.html#creators">Creators</a></li>
+<li><a href="../index.html#about">About</a></li>
+<li><a href="https://suzuri.jp/RAID3" target="_blank">Store</a></li>
+</ul>
+</nav>
+<article class="news-article">
+<header class="news-article-header">
+<a href="index.html" class="news-article-back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Back to News</a>
+<div class="news-article-tags">${(item.tags || []).map(t => `<span class="news-tag">#${escapeHtml(t)}</span>`).join('')}</div>
+<h1 class="news-article-title">${title}</h1>
+<p class="news-article-date">${item.date || ''}</p>
+</header>
+<div class="news-article-image">${item.thumbnail ? `<img src="../${item.thumbnail}" alt="${title}">` : '<div class="news-card-placeholder">R3</div>'}</div>
+<div class="news-article-body">${item.body || '<p>本文が準備中です。</p>'}</div>
+<div class="news-article-share"><p>Share</p><div class="share-buttons">
+<a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(articleUrl)}&text=${encodeURIComponent(item.title + ' | RAID3')}" target="_blank" class="share-btn">
+<svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+</a></div></div>
+</article>
+<footer style="text-align: center; padding: 2rem; border-top: 1px solid #2a2a2a;"><p style="font-size: 0.7rem; color: #666;">&copy; 2025 RAID3. All rights reserved.</p></footer>
+</body></html>`;
         }
 
         function escapeHtml(text) {
+            if (!text) return '';
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
 
-        function downloadFile(filename, content) {
-            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
+        // ==================== 初期化 ====================
+        async function init() {
+            await initDB();
+            await loadAllImages();
+            renderImageGrid();
+            renderList();
         }
 
-        // 初期化
-        renderList();
+        init();
     </script>
 </body>
 </html>
