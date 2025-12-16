@@ -8,6 +8,58 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../styles.css">
+    <style>
+        .export-section {
+            background: #1a1a1a;
+            border: 2px solid #c8ff00;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .export-section h3 {
+            color: #c8ff00;
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .export-section p {
+            color: #999;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+        }
+        .export-btn {
+            background: #c8ff00;
+            color: #000;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .export-btn:hover {
+            background: #fff;
+            transform: scale(1.05);
+        }
+        .export-steps {
+            background: #111;
+            padding: 1rem;
+            margin-top: 1rem;
+            text-align: left;
+            font-size: 0.8rem;
+            color: #ccc;
+        }
+        .export-steps ol {
+            margin: 0.5rem 0 0 1.5rem;
+            padding: 0;
+        }
+        .export-steps li {
+            margin-bottom: 0.5rem;
+        }
+        .export-steps strong {
+            color: #c8ff00;
+        }
+    </style>
 </head>
 <body>
     <nav id="navbar">
@@ -32,6 +84,26 @@
             <h2 class="section-title">NEWS EDITOR</h2>
         </div>
 
+        <!-- ★★★ エクスポートセクション ★★★ -->
+        <div class="export-section">
+            <h3>📦 サイトに公開する</h3>
+            <p>編集が完了したら、このボタンでファイルをダウンロードしてGitHubにアップロードしてください。</p>
+            <button class="export-btn" onclick="exportNewsData()">
+                📥 news-data.js をダウンロード
+            </button>
+            <div class="export-steps">
+                <strong>公開手順：</strong>
+                <ol>
+                    <li>上のボタンをクリックしてファイルをダウンロード</li>
+                    <li>GitHubのリポジトリを開く</li>
+                    <li>「Add file」→「Upload files」をクリック</li>
+                    <li>ダウンロードした <strong>news-data.js</strong> をドラッグ＆ドロップ</li>
+                    <li>「Commit changes」をクリック</li>
+                    <li>1〜2分でVercelが自動更新！</li>
+                </ol>
+            </div>
+        </div>
+
         <div class="news-editor-grid">
             <form id="newsForm" class="news-editor-form">
                 <div class="form-row">
@@ -50,14 +122,9 @@
                 </div>
 
                 <div class="form-row">
-                    <label for="thumbnailUrl">サムネイルURL（任意）</label>
-                    <input id="thumbnailUrl" name="thumbnailUrl" type="url" placeholder="https://... または images/xxx.png">
-                </div>
-
-                <div class="form-row">
-                    <label for="thumbnailFile">サムネイル画像（任意・ローカル）</label>
-                    <input id="thumbnailFile" name="thumbnailFile" type="file" accept="image/*">
-                    <small>※ローカル選択時はブラウザ保存（data URL）になります。</small>
+                    <label for="thumbnailUrl">サムネイル画像パス（任意）</label>
+                    <input id="thumbnailUrl" name="thumbnailUrl" type="text" placeholder="images/ファイル名.png">
+                    <small>※ images フォルダに画像を入れた場合は「images/ファイル名.png」と入力（../は不要）</small>
                 </div>
 
                 <div class="form-row">
@@ -68,7 +135,7 @@
                 <div class="form-row">
                     <label for="body">本文（HTML可）</label>
                     <textarea id="body" name="body" rows="10" placeholder="<p>本文を入力</p>" required></textarea>
-                    <small>※改行のみでも保存できます。簡易HTMLタグ利用可。</small>
+                    <small>※HTMLタグが使えます。&lt;p&gt;段落&lt;/p&gt; &lt;h2&gt;見出し&lt;/h2&gt; &lt;ul&gt;&lt;li&gt;リスト&lt;/li&gt;&lt;/ul&gt;</small>
                 </div>
 
                 <div class="form-actions">
@@ -115,14 +182,12 @@
         const excerptInput = document.getElementById('excerpt');
         const bodyInput = document.getElementById('body');
         const thumbUrlInput = document.getElementById('thumbnailUrl');
-        const thumbFileInput = document.getElementById('thumbnailFile');
         const tagBox = document.getElementById('tagCheckboxes');
         const listWrap = document.getElementById('newsList');
         const resetBtn = document.getElementById('resetBtn');
         const resetDataBtn = document.getElementById('resetDataBtn');
 
         let editId = null;
-        let fileDataUrl = '';
 
         function buildTagInputs() {
             tagBox.innerHTML = '';
@@ -141,15 +206,6 @@
         function setCheckedTags(tags = []) {
             Array.from(tagBox.querySelectorAll('input[type="checkbox"]')).forEach(input => {
                 input.checked = tags.includes(input.value);
-            });
-        }
-
-        function readFileAsDataUrl(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
             });
         }
 
@@ -218,8 +274,7 @@
             dateInput.value = item.date || '';
             excerptInput.value = item.excerpt || '';
             bodyInput.value = item.body || '';
-            thumbUrlInput.value = item.thumbnail && item.thumbnail.startsWith('http') ? item.thumbnail : '';
-            fileDataUrl = item.thumbnail && item.thumbnail.startsWith('data:') ? item.thumbnail : '';
+            thumbUrlInput.value = item.thumbnail || '';
             setCheckedTags(item.tags || []);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -233,12 +288,8 @@
             const date = dateInput.value || new Date().toISOString().slice(0, 10);
             const excerpt = excerptInput.value.trim();
             const body = bodyInput.value.trim() || '<p>本文が準備中です。</p>';
+            const thumbnail = thumbUrlInput.value.trim() || '';
 
-            if (thumbFileInput.files[0]) {
-                fileDataUrl = await readFileAsDataUrl(thumbFileInput.files[0]);
-            }
-
-            const thumbnail = fileDataUrl || thumbUrlInput.value.trim() || '';
             const payload = {
                 id: editId || `news-${Date.now()}`,
                 title,
@@ -251,18 +302,97 @@
             };
 
             window.NewsData.upsert(payload);
-            alert('保存しました。');
+            alert('保存しました。\n\n※公開するには「news-data.jsをダウンロード」ボタンを押してGitHubにアップロードしてください。');
             editId = null;
             form.reset();
-            fileDataUrl = '';
             renderList();
         }
 
         function resetForm() {
             editId = null;
-            fileDataUrl = '';
             form.reset();
             setCheckedTags([]);
+        }
+
+        // ★★★ エクスポート機能 ★★★
+        function exportNewsData() {
+            const items = window.NewsData.getAll();
+            
+            // news-data.js のコードを生成
+            const jsCode = `(() => {
+  const defaultNews = ${JSON.stringify(items, null, 4).replace(/\n/g, '\n  ')};
+
+  const TAGS = ['ANNOUNCEMENT', 'TEAM', 'EVENT', 'STORE', 'STREAM', 'WEB3'];
+  const STORAGE_KEY = 'newsData';
+
+  const load = () => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return [...defaultNews];
+      const parsed = JSON.parse(raw);
+      if (!Array.isArray(parsed) || parsed.length === 0) return [...defaultNews];
+      return parsed;
+    } catch {
+      return [...defaultNews];
+    }
+  };
+
+  const persist = (items) => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+  };
+
+  const sortDesc = (items) =>
+    [...items].sort((a, b) => new Date(b.date || b.createdAt || 0) - new Date(a.date || a.createdAt || 0));
+
+  const getAll = () => sortDesc(load());
+
+  const getById = (id) => load().find((item) => item.id === id);
+
+  const upsert = (payload) => {
+    const items = load();
+    const index = items.findIndex((i) => i.id === payload.id);
+    if (index >= 0) {
+      items[index] = { ...items[index], ...payload };
+    } else {
+      items.push(payload);
+    }
+    persist(items);
+    return sortDesc(items);
+  };
+
+  const remove = (id) => {
+    persist(load().filter((i) => i.id !== id));
+    return getAll();
+  };
+
+  const reset = () => {
+    persist(defaultNews);
+    return getAll();
+  };
+
+  window.NewsData = {
+    TAGS,
+    getAll,
+    getById,
+    upsert,
+    remove,
+    reset
+  };
+})();
+`;
+
+            // ファイルをダウンロード
+            const blob = new Blob([jsCode], { type: 'application/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'news-data.js';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            alert('ダウンロード完了！\n\nこのファイルをGitHubにアップロードしてください。\n（既存のnews-data.jsを上書き）');
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -280,12 +410,7 @@
                     resetForm();
                 }
             });
-
-            thumbFileInput.addEventListener('change', () => {
-                fileDataUrl = '';
-            });
         });
     </script>
 </body>
 </html>
-
