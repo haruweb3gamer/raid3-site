@@ -4,6 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RAID3 - Web3 Gaming is Inevitable</title>
+    
+    <!-- ファビコン -->
+    <link rel="icon" href="images/R3aicon.png" type="image/png">
+    <link rel="apple-touch-icon" href="images/R3aicon.png">
+    
+    <!-- OGP（SNSシェア用） -->
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="RAID3">
+    <meta property="og:title" content="RAID3 - Web3 Gaming is Inevitable">
+    <meta property="og:description" content="Web3Gameに特化したストリーマー・コンテンツクリエイターチーム">
+    <meta property="og:image" content="https://raid3.vercel.app/images/R3aicon.png">
+    <meta property="og:url" content="https://raid3.vercel.app/">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@raid3__">
+    <meta name="twitter:title" content="RAID3 - Web3 Gaming is Inevitable">
+    <meta name="twitter:description" content="Web3Gameに特化したストリーマー・コンテンツクリエイターチーム">
+    <meta name="twitter:image" content="https://raid3.vercel.app/images/R3aicon.png">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -62,12 +82,6 @@
     </section>
 
     <!-- ========== ニュース ========== -->
-    <!-- 
-        ★ ニュースを追加するには：
-        1. news フォルダに新しいHTMLファイルを作成（例：004.html）
-        2. 下のnews-cardをコピーして、リンクとタイトルを変更
-        3. 一番新しい記事を左側（上）に配置
-    -->
     <section id="news" class="news-home">
         <div class="section-header">
             <p class="section-subtitle">Latest Updates</p>
@@ -77,8 +91,7 @@
             <button class="carousel-nav prev" onclick="scrollCarousel(-1)">
                 <svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
             </button>
-            <div class="news-carousel" id="newsCarousel">
-            </div>
+            <div class="news-carousel" id="newsCarousel"></div>
             <button class="carousel-nav next" onclick="scrollCarousel(1)">
                 <svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
             </button>
@@ -99,86 +112,33 @@
                 <p>エージェンシーの利点とクリエイターの自由を両立させた「HUB」モデルを採用し、専属契約なしでコミュニティスタイルの活動を可能にしています。</p>
             </div>
             <div class="about-stats reveal">
-                <div class="stat-item">
-                    <span class="stat-number">10+</span>
-                    <span class="stat-label">Creators</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">50K+</span>
-                    <span class="stat-label">Followers</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">100+</span>
-                    <span class="stat-label">Streams</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">20+</span>
-                    <span class="stat-label">collab</span>
-                </div>
+                <div class="stat-item"><span class="stat-number">10+</span><span class="stat-label">Creators</span></div>
+                <div class="stat-item"><span class="stat-number">50K+</span><span class="stat-label">Followers</span></div>
+                <div class="stat-item"><span class="stat-number">100+</span><span class="stat-label">Streams</span></div>
+                <div class="stat-item"><span class="stat-number">20+</span><span class="stat-label">collab</span></div>
             </div>
         </div>
-
-        <!-- ロゴマーキー（コラボゲームタイトル） -->
         <div class="logo-marquee reveal">
             <div class="logo-marquee-inner">
                 <div class="logo-marquee-track">
-                    <!-- ★ ロゴ画像を images/Collablogo に配置し、ファイル名を変更してください -->
-                    <div class="logo-marquee-item">
-                        <img src="images/Collablogo/game1.png" alt="Game Title 1">
-                    </div>
-                    <div class="logo-marquee-item">
-                        <img src="images/Collablogo/game2.png" alt="Game Title 2">
-                    </div>
-                    <div class="logo-marquee-item">
-                        <img src="images/Collablogo/game3.png" alt="Game Title 3">
-                    </div>
-                    <div class="logo-marquee-item">
-                        <img src="images/Collablogo/game4.png" alt="Game Title 4">
-                    </div>
-                    <div class="logo-marquee-item">
-                        <img src="images/Collablogo/game5.png" alt="Game Title 5">
-                    </div>
-                    <div class="logo-marquee-item">
-                        <img src="images/Collablogo/game6.png" alt="Game Title 6">
-                    </div>
-                    <div class="logo-marquee-item">
-                        <img src="images/Collablogo/game7.png" alt="Game Title 7">
-                    </div>
-                    <div class="logo-marquee-item">
-                        <img src="images/Collablogo/game8.png" alt="Game Title 8">
-                    </div>
-                    <div class="logo-marquee-item">
-                        <img src="images/Collablogo/game9.png" alt="Game Title 9">
-                    </div>
-
-                    <!-- 無限ループ用に同じ並びを複製 -->
-                    <div class="logo-marquee-item">
-                        <img src="images/Collablogo/game1.png" alt="Game Title 1">
-                    </div>
-                    <div class="logo-marquee-item">
-                        <img src="images/Collablogo/game2.png" alt="Game Title 2">
-                    </div>
-                    <div class="logo-marquee-item">
-                        <img src="images/Collablogo/game3.png" alt="Game Title 3">
-                    </div>
-                    <div class="logo-marquee-item">
-                        <img src="images/Collablogo/game4.png" alt="Game Title 4">
-                    </div>
-                    <div class="logo-marquee-item">
-                        <img src="images/Collablogo/game5.png" alt="Game Title 5">
-                    </div>
-                    <div class="logo-marquee-item">
-                        <img src="images/Collablogo/game6.png" alt="Game Title 6">
-                    </div>
-                    <div class="logo-marquee-item">
-                        <img src="images/Collablogo/game7.png" alt="Game Title 7">
-                    </div>
-                    <div class="logo-marquee-item">
-                        <img src="images/Collablogo/game8.png" alt="Game Title 8">
-                    </div>
-                    <div class="logo-marquee-item">
-                        <img src="images/Collablogo/game9.png" alt="Game Title 9">
-                    </div>
+                    <div class="logo-marquee-item"><img src="images/Collablogo/game1.png" alt="Game Title 1"></div>
+                    <div class="logo-marquee-item"><img src="images/Collablogo/game2.png" alt="Game Title 2"></div>
+                    <div class="logo-marquee-item"><img src="images/Collablogo/game3.png" alt="Game Title 3"></div>
+                    <div class="logo-marquee-item"><img src="images/Collablogo/game4.png" alt="Game Title 4"></div>
+                    <div class="logo-marquee-item"><img src="images/Collablogo/game5.png" alt="Game Title 5"></div>
+                    <div class="logo-marquee-item"><img src="images/Collablogo/game6.png" alt="Game Title 6"></div>
+                    <div class="logo-marquee-item"><img src="images/Collablogo/game7.png" alt="Game Title 7"></div>
+                    <div class="logo-marquee-item"><img src="images/Collablogo/game8.png" alt="Game Title 8"></div>
+                    <div class="logo-marquee-item"><img src="images/Collablogo/game9.png" alt="Game Title 9"></div>
+                    <div class="logo-marquee-item"><img src="images/Collablogo/game1.png" alt="Game Title 1"></div>
+                    <div class="logo-marquee-item"><img src="images/Collablogo/game2.png" alt="Game Title 2"></div>
+                    <div class="logo-marquee-item"><img src="images/Collablogo/game3.png" alt="Game Title 3"></div>
+                    <div class="logo-marquee-item"><img src="images/Collablogo/game4.png" alt="Game Title 4"></div>
+                    <div class="logo-marquee-item"><img src="images/Collablogo/game5.png" alt="Game Title 5"></div>
+                    <div class="logo-marquee-item"><img src="images/Collablogo/game6.png" alt="Game Title 6"></div>
+                    <div class="logo-marquee-item"><img src="images/Collablogo/game7.png" alt="Game Title 7"></div>
+                    <div class="logo-marquee-item"><img src="images/Collablogo/game8.png" alt="Game Title 8"></div>
+                    <div class="logo-marquee-item"><img src="images/Collablogo/game9.png" alt="Game Title 9"></div>
                 </div>
             </div>
         </div>
@@ -207,19 +167,7 @@
             <h2 class="section-title">CREATORS</h2>
         </div>
         <div class="creators-grid" id="creatorsGrid">
-            <!-- 
-                ★ クリエイター画像の入れ方 ★
-                
-                1. images フォルダを作成
-                2. 画像を入れる（例：haru.jpg）
-                3. 下の「画像を使う場合」のコメントを外して、ファイル名を変更
-                
-                画像サイズの目安：縦長（3:4比率）、幅400px以上推奨
-            -->
-
-            <!-- クリエイター1 -->
             <div class="creator-card reveal">
-                <!-- 画像を使う場合：下の行のコメントを外してファイル名を変更 -->
                 <img src="images/haru.png" alt="HARU" class="creator-image">
                 <div class="creator-placeholder">R3</div>
                 <div class="creator-info">
@@ -232,8 +180,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- クリエイター2 -->
             <div class="creator-card reveal">
                 <img src="images/Gou.png" alt="Gou" class="creator-image">
                 <div class="creator-placeholder">R3</div>
@@ -247,8 +193,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- クリエイター3 -->
             <div class="creator-card reveal">
                 <img src="images/Late.png" alt="Late" class="creator-image">
                 <div class="creator-placeholder">R3</div>
@@ -257,25 +201,22 @@
                     <p class="creator-role">VTuber</p>
                     <div class="creator-socials">
                         <a href="https://x.com/Bel_L_0o">𝕏</a>
-                        <a href="https://www.twitch.tv/o0_late_0o">Twitch</a></div>
+                        <a href="https://www.twitch.tv/o0_late_0o">Twitch</a>
+                    </div>
                 </div>
             </div>
-
-            <!-- クリエイター4 -->
             <div class="creator-card reveal">
-                <img src="images/tuyuri.png" alt="CREATOR_04" class="creator-image">
+                <img src="images/tuyuri.png" alt="Tsuyuri" class="creator-image">
                 <div class="creator-placeholder">R3</div>
                 <div class="creator-info">
                     <h3 class="creator-name">Tsuyuri</h3>
                     <p class="creator-role">Streamer</p>
                     <div class="creator-socials">
                         <a href="https://x.com/schranzfolio">𝕏</a>
-                        <a href="https://www.twitch.tv/tsuyurichan15">Twitch</a></div>
-
+                        <a href="https://www.twitch.tv/tsuyurichan15">Twitch</a>
+                    </div>
                 </div>
             </div>
-
-            <!-- 以下は非表示（展開で表示） -->
             <div class="creator-card reveal hidden-card">
                 <img src="images/kings.png" alt="Kings" class="creator-image">
                 <div class="creator-placeholder">R3</div>
@@ -289,7 +230,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="creator-card reveal hidden-card">
                 <img src="images/Conia.png" alt="Conia" class="creator-image">
                 <div class="creator-placeholder">R3</div>
@@ -302,7 +242,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="creator-card reveal hidden-card">
                 <img src="images/Zaikoku.png" alt="Zaikoku" class="creator-image">
                 <div class="creator-placeholder">R3</div>
@@ -315,7 +254,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="creator-card reveal hidden-card">
                 <img src="images/Oshio.png" alt="Oshio" class="creator-image">
                 <div class="creator-placeholder">R3</div>
@@ -329,7 +267,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="creator-card reveal hidden-card">
                 <img src="images/kenny.png" alt="kenny" class="creator-image">
                 <div class="creator-placeholder">R3</div>
@@ -342,7 +279,6 @@
                     </div>
                 </div>
             </div>
-
             <div class="creator-card reveal hidden-card">
                 <img src="images/Spade.png" alt="Spade" class="creator-image">
                 <div class="creator-placeholder">R3</div>
@@ -370,25 +306,8 @@
             <h2 class="section-title">STORE</h2>
         </div>
         <div class="store-grid">
-            <!-- 
-                ★ 商品画像の追加方法 ★
-                
-                1. images フォルダに商品画像を追加（例：logo-tee.jpg）
-                2. 下のように <img> タグを追加（プレースホルダーの "R3" の前に追加）
-                
-                例：
-                <div class="store-image">
-                    <img src="images/logo-tee.jpg" alt="RAID3 LOGO TEE">
-                    R3
-                </div>
-                
-                画像がある場合、プレースホルダーの "R3" は非表示になります。
-                画像サイズの目安：正方形（1:1比率）、幅400px以上推奨
-            -->
             <div class="store-item reveal">
-                <div class="store-image">
-                    <img src="images/LongTshirt.png" alt="RAID3 LOGO TEE">
-                    R3</div>
+                <div class="store-image"><img src="images/LongTshirt.png" alt="RAID3 LOGO TEE">R3</div>
                 <h3 class="store-title">RAID3 LONG T-SHIRT</h3>
                 <p class="store-price">¥6,006</p>
                 <a href="https://suzuri.jp/RAID3/19081668/long-sleeve-t-shirt/s/white" target="_blank" class="btn btn-secondary">View Details</a>
@@ -463,41 +382,23 @@
 
     <script src="news-data.js"></script>
     <script>
-// スクロール時のアニメーション
 function reveal() {
     document.querySelectorAll('.reveal').forEach(el => {
-        if (el.getBoundingClientRect().top < window.innerHeight - 100) {
-            el.classList.add('active');
-        }
+        if (el.getBoundingClientRect().top < window.innerHeight - 100) el.classList.add('active');
     });
 }
+function handleScroll() { document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50); }
+function toggleMenu() { document.querySelector('.nav-links').classList.toggle('active'); }
+function scrollCarousel(dir) { document.getElementById('newsCarousel').scrollBy({ left: dir * 440, behavior: 'smooth' }); }
 
-// ナビバーのスクロール効果
-function handleScroll() {
-    document.getElementById('navbar').classList.toggle('scrolled', window.scrollY > 50);
-}
-
-// モバイルメニュー
-function toggleMenu() {
-    document.querySelector('.nav-links').classList.toggle('active');
-}
-
-// ニュースカルーセル
-function scrollCarousel(dir) {
-    document.getElementById('newsCarousel').scrollBy({ left: dir * 440, behavior: 'smooth' });
-}
-
-// ホームニュース動的生成
 function renderHomeNews() {
     const container = document.getElementById('newsCarousel');
     if (!container || !window.NewsData) return;
     const carouselWrapper = container.closest('.news-carousel-container');
     const prevBtn = carouselWrapper ? carouselWrapper.querySelector('.carousel-nav.prev') : null;
     const nextBtn = carouselWrapper ? carouselWrapper.querySelector('.carousel-nav.next') : null;
-
     const items = window.NewsData.getAll().slice(0, 6);
     container.innerHTML = '';
-
     if (!items.length) {
         const empty = document.createElement('p');
         empty.className = 'news-empty';
@@ -505,12 +406,10 @@ function renderHomeNews() {
         container.appendChild(empty);
         return;
     }
-
     items.forEach(item => {
         const card = document.createElement('a');
         card.className = 'news-card reveal';
         card.href = `news/article.html?id=${item.id}`;
-
         const image = document.createElement('div');
         image.className = 'news-card-image';
         if (item.thumbnail) {
@@ -524,10 +423,8 @@ function renderHomeNews() {
             placeholder.textContent = 'R3';
             image.appendChild(placeholder);
         }
-
         const content = document.createElement('div');
         content.className = 'news-card-content';
-
         const tags = document.createElement('div');
         tags.className = 'news-card-tags';
         (item.tags || []).forEach(tag => {
@@ -536,31 +433,23 @@ function renderHomeNews() {
             span.textContent = `#${tag}`;
             tags.appendChild(span);
         });
-
         const title = document.createElement('h3');
         title.className = 'news-card-title';
         title.textContent = item.title;
-
         content.appendChild(tags);
         content.appendChild(title);
-
         card.appendChild(image);
         card.appendChild(content);
         container.appendChild(card);
     });
-
     const fewItems = items.length <= 2;
     container.classList.toggle('few-items', fewItems);
-    if (carouselWrapper) {
-        carouselWrapper.classList.toggle('is-disabled', fewItems);
-    }
+    if (carouselWrapper) carouselWrapper.classList.toggle('is-disabled', fewItems);
     if (prevBtn) prevBtn.style.display = fewItems ? 'none' : '';
     if (nextBtn) nextBtn.style.display = fewItems ? 'none' : '';
-
     reveal();
 }
 
-// クリエイター展開
 let isExpanded = false;
 function toggleCreators() {
     isExpanded = !isExpanded;
@@ -572,18 +461,12 @@ function toggleCreators() {
     document.getElementById('expandBtn').classList.toggle('expanded', isExpanded);
 }
 
-// イベントリスナー
 window.addEventListener('scroll', reveal);
 window.addEventListener('scroll', handleScroll);
-window.addEventListener('load', () => {
-    renderHomeNews();
-    reveal();
-});
-
+window.addEventListener('load', () => { renderHomeNews(); reveal(); });
 document.querySelectorAll('.nav-links a').forEach(link => {
     link.addEventListener('click', () => document.querySelector('.nav-links').classList.remove('active'));
 });
-
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function(e) {
         e.preventDefault();
