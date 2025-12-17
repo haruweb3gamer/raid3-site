@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="../styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <style>
-        /* エクスポートセクション */
         .export-section {
             background: #1a1a1a;
             border: 2px solid #c8ff00;
@@ -66,8 +65,6 @@
         .export-steps strong {
             color: #c8ff00;
         }
-
-        /* 画像管理セクション */
         .image-manager {
             background: #1a1a1a;
             padding: 1.5rem;
@@ -106,6 +103,16 @@
             background: #2a2a2a;
             border-radius: 4px;
             overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        .image-item:hover {
+            border-color: #c8ff00;
+        }
+        .image-item.selected {
+            border-color: #c8ff00;
+            box-shadow: 0 0 10px rgba(200, 255, 0, 0.3);
         }
         .image-item img {
             width: 100%;
@@ -136,9 +143,39 @@
             cursor: pointer;
             font-size: 0.8rem;
             line-height: 1;
+            opacity: 0;
+            transition: opacity 0.2s;
         }
-
-        /* HTMLタグボタン */
+        .image-item:hover .image-item-delete {
+            opacity: 1;
+        }
+        .thumbnail-select {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .thumbnail-select input {
+            flex: 1;
+            min-width: 200px;
+        }
+        .thumbnail-preview {
+            width: 60px;
+            height: 60px;
+            background: #2a2a2a;
+            border-radius: 4px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 0.7rem;
+        }
+        .thumbnail-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
         .html-buttons {
             display: flex;
             gap: 0.5rem;
@@ -159,8 +196,6 @@
             background: #333;
             border-color: #c8ff00;
         }
-
-        /* ステータスバー */
         .status-bar {
             background: #111;
             padding: 0.75rem 1rem;
@@ -171,11 +206,68 @@
             font-size: 0.85rem;
         }
         .status-bar .count { color: #c8ff00; }
-
-        /* フォーム調整 */
         .news-editor-form textarea {
             font-family: 'Inter', monospace;
             resize: vertical;
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        .modal-overlay.active {
+            display: block;
+        }
+        .modal-content {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: #111;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #333;
+        }
+        .modal-header h3 {
+            font-size: 1.2rem;
+            margin: 0;
+        }
+        .modal-close {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 2rem;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .modal-body {
+            padding: 0;
+        }
+        .preview-frame {
+            width: 100%;
+            min-height: 600px;
+            border: none;
+            background: #0a0a0a;
+        }
+        .news-editor-card {
+            background: #1a1a1a;
+            border: 1px solid #2a2a2a;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+        }
+        .news-editor-card h4 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1rem;
         }
     </style>
 </head>
@@ -202,19 +294,15 @@
             <h2 class="section-title">NEWS EDITOR</h2>
         </div>
 
-        <!-- ステータスバー -->
         <div class="status-bar">
             <span>記事数: <strong class="count" id="newsCount">0</strong> | 画像数: <strong class="count" id="imageCount">0</strong></span>
             <button class="btn btn-secondary" onclick="clearAllData()" style="padding: 0.5rem 1rem; font-size: 0.75rem;">🗑️ 全データクリア</button>
         </div>
 
-        <!-- エクスポートセクション -->
         <div class="export-section">
             <h3>📦 サイトに公開する</h3>
             <p>編集が完了したら、このボタンでファイルをダウンロードしてGitHubにアップロードしてください。</p>
-            <button class="export-btn" onclick="exportZip()" id="exportZipBtn">
-                📥 ZIPでまとめてダウンロード
-            </button>
+            <button class="export-btn" onclick="exportZip()" id="exportZipBtn">📥 ZIPでまとめてダウンロード</button>
             <div class="export-steps">
                 <strong>ZIPファイルに含まれるもの：</strong>
                 <ol>
@@ -233,9 +321,8 @@
             </div>
         </div>
 
-        <!-- 画像管理 -->
         <div class="image-manager">
-            <h3>🖼️ 画像管理</h3>
+            <h3>🖼️ 画像管理 <small style="font-weight: normal; color: #999;">（クリックでサムネイルに設定）</small></h3>
             <div class="image-upload-area" id="imageUploadArea">
                 <p>📁 クリックまたはドラッグ＆ドロップで画像を追加</p>
                 <p style="font-size: 0.75rem; margin-top: 0.5rem;">PNG, JPG, GIF, WebP対応</p>
@@ -269,9 +356,12 @@
                 </div>
 
                 <div class="form-row">
-                    <label for="thumbnailUrl">サムネイル画像パス（任意）</label>
-                    <input id="thumbnailUrl" name="thumbnailUrl" type="text" placeholder="images/news001.png">
-                    <small>※ 上の画像管理でアップロードした場合は images/ファイル名.png のように指定</small>
+                    <label for="thumbnailUrl">サムネイル画像</label>
+                    <div class="thumbnail-select">
+                        <input id="thumbnailUrl" name="thumbnailUrl" type="text" placeholder="上の画像をクリックで選択" readonly>
+                        <div class="thumbnail-preview" id="thumbnailPreview">なし</div>
+                        <button type="button" class="btn btn-secondary" onclick="clearThumbnail()" style="padding: 0.5rem;">✕</button>
+                    </div>
                 </div>
 
                 <div class="form-row">
@@ -293,8 +383,8 @@
 
                 <div class="form-actions">
                     <button type="submit" class="btn btn-primary">💾 保存</button>
-                    <button type="button" id="resetBtn" class="btn btn-secondary">フォームをリセット</button>
-                    <button type="button" id="resetDataBtn" class="btn btn-secondary">初期データに戻す</button>
+                    <button type="button" class="btn btn-secondary" onclick="previewCurrent()">👁️ プレビュー</button>
+                    <button type="button" id="resetBtn" class="btn btn-secondary">リセット</button>
                 </div>
             </form>
 
@@ -308,22 +398,61 @@
         </div>
     </section>
 
+    <div class="modal-overlay" id="previewModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📱 プレビュー</h3>
+                <button class="modal-close" onclick="closePreview()">×</button>
+            </div>
+            <div class="modal-body">
+                <iframe id="previewFrame" class="preview-frame"></iframe>
+            </div>
+        </div>
+    </div>
+
     <footer style="text-align: center; padding: 2rem; border-top: 1px solid #2a2a2a;">
         <p style="font-size: 0.7rem; color: #666;">&copy; 2025 RAID3. All rights reserved.</p>
     </footer>
 
-    <script src="../news-data.js"></script>
     <script>
-        // ==================== 定数・初期化 ====================
         const SITE_URL = 'https://raid3.vercel.app';
         const TAGS = ['ANNOUNCEMENT', 'TEAM', 'EVENT', 'STORE', 'STREAM', 'WEB3'];
+        const STORAGE_KEY = 'raid3_news_editor';
         const DB_NAME = 'raid3_news_db';
         const DB_VERSION = 1;
         let db = null;
         let uploadedImages = {};
-        let editId = null;
 
-        // DOM要素
+        const defaultNews = [
+            {
+                "id": "003",
+                "title": "２周年記念配信決定",
+                "date": "2025-12-16",
+                "thumbnail": "images/news002.png",
+                "tags": ["STREAM"],
+                "excerpt": "12月20日22:00 RAID3公式YouTubeチャンネルにて2周年記念配信を行います。",
+                "body": "<h2>12月20日22:00 RAID3公式YouTubeチャンネルにて配信</h2>\n\n<p>配信は<a href=\"https://www.youtube.com/live/xb7QdSKes1w?si=-8UenLNFQcQ5yVTY\">こちら</a>から</p>\n\n<p>配信中にサプライズも⁉</p>\n<p>同日にプレミア公開予定の動画もお楽しみに➡<a href=\"https://youtu.be/QY6dfnIhtW0?si=o3WUKRbYRQfur1cU\">こちら</a></p>"
+            },
+            {
+                "id": "002",
+                "title": "RAID3 公式サイトリニューアルのお知らせ",
+                "date": "2025-12-15",
+                "thumbnail": "images/news001.png",
+                "tags": ["ANNOUNCEMENT"],
+                "excerpt": "RAID3の公式ウェブサイトを全面リニューアルいたしました。",
+                "body": "<p>いつもRAID3を応援いただき、誠にありがとうございます。</p>\n\n<p>この度、RAID3の公式ウェブサイトを全面リニューアルいたしました。</p>"
+            },
+            {
+                "id": "001",
+                "title": "チーム名変更のお知らせ",
+                "date": "2025-12-08",
+                "thumbnail": "images/news003.png",
+                "tags": ["ANNOUNCEMENT"],
+                "excerpt": "OTAKU STREAMERSからRAID3へチーム名を変更しました。",
+                "body": "<p>この度、新たなスタートを切る事となり、チーム名を変更致しました</p>\n\n<p>前) OTAKU STREAMERS</p>\n<p>後) RAID3 (レイドスリー)</p>"
+            }
+        ];
+
         const form = document.getElementById('newsForm');
         const newsIdInput = document.getElementById('newsId');
         const titleInput = document.getElementById('title');
@@ -331,12 +460,11 @@
         const excerptInput = document.getElementById('excerpt');
         const bodyInput = document.getElementById('body');
         const thumbUrlInput = document.getElementById('thumbnailUrl');
+        const thumbPreview = document.getElementById('thumbnailPreview');
         const tagBox = document.getElementById('tagCheckboxes');
         const listWrap = document.getElementById('newsList');
-        const resetBtn = document.getElementById('resetBtn');
-        const resetDataBtn = document.getElementById('resetDataBtn');
 
-        // ==================== IndexedDB（画像保存用） ====================
+        // IndexedDB
         async function initDB() {
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open(DB_NAME, DB_VERSION);
@@ -382,7 +510,7 @@
             });
         }
 
-        // ==================== 画像管理UI ====================
+        // 画像管理
         function renderImageGrid() {
             const grid = document.getElementById('imageGrid');
             const filenames = Object.keys(uploadedImages);
@@ -392,18 +520,49 @@
                 grid.innerHTML = '<p style="color:#666; grid-column: 1/-1; font-size: 0.8rem;">画像がありません</p>';
                 return;
             }
-            grid.innerHTML = filenames.map(filename => `
-                <div class="image-item">
+            grid.innerHTML = filenames.map(filename => {
+                const isSelected = thumbUrlInput.value === `images/${filename}`;
+                return `
+                <div class="image-item ${isSelected ? 'selected' : ''}" onclick="selectThumbnail('${filename}')" title="クリックでサムネイルに設定">
                     <img src="${uploadedImages[filename]}" alt="${filename}">
                     <div class="image-item-info">${filename}</div>
-                    <button class="image-item-delete" onclick="handleDeleteImage('${filename}')">×</button>
+                    <button class="image-item-delete" onclick="event.stopPropagation(); handleDeleteImage('${filename}')">×</button>
                 </div>
-            `).join('');
+            `}).join('');
+        }
+
+        function selectThumbnail(filename) {
+            thumbUrlInput.value = `images/${filename}`;
+            updateThumbnailPreview();
+            renderImageGrid();
+        }
+
+        function clearThumbnail() {
+            thumbUrlInput.value = '';
+            thumbPreview.innerHTML = 'なし';
+            renderImageGrid();
+        }
+
+        function updateThumbnailPreview() {
+            const path = thumbUrlInput.value;
+            if (!path) {
+                thumbPreview.innerHTML = 'なし';
+                return;
+            }
+            const filename = path.replace(/^(\.\.\/)?images\//, '');
+            if (uploadedImages[filename]) {
+                thumbPreview.innerHTML = `<img src="${uploadedImages[filename]}" alt="preview">`;
+            } else {
+                thumbPreview.innerHTML = filename.substring(0, 8) + '...';
+            }
         }
 
         async function handleDeleteImage(filename) {
             if (confirm(`${filename} を削除しますか？`)) {
                 await deleteImage(filename);
+                if (thumbUrlInput.value === `images/${filename}`) {
+                    clearThumbnail();
+                }
                 renderImageGrid();
             }
         }
@@ -420,7 +579,6 @@
             });
         }
 
-        // 画像アップロードエリアのイベント
         const uploadArea = document.getElementById('imageUploadArea');
         const imageInput = document.getElementById('imageInput');
         uploadArea.addEventListener('click', () => imageInput.click());
@@ -433,7 +591,7 @@
         });
         imageInput.addEventListener('change', (e) => handleImageUpload(e.target.files));
 
-        // ==================== タグ選択式 ====================
+        // タグ
         function buildTagInputs() {
             tagBox.innerHTML = '';
             TAGS.forEach(tag => {
@@ -454,11 +612,11 @@
 
         function setCheckedTags(tags) {
             tagBox.querySelectorAll('input').forEach(input => {
-                input.checked = tags.includes(input.value);
+                input.checked = (tags || []).includes(input.value);
             });
         }
 
-        // ==================== HTMLタグ挿入 ====================
+        // HTMLタグ挿入
         function insertTag(tagName) {
             const textarea = bodyInput;
             const start = textarea.selectionStart;
@@ -466,11 +624,8 @@
             const selectedText = textarea.value.substring(start, end);
             const before = textarea.value.substring(0, start);
             const after = textarea.value.substring(end);
-            
             const newText = `<${tagName}>${selectedText}</${tagName}>`;
             textarea.value = before + newText + after;
-            
-            // カーソル位置を調整
             const cursorPos = start + tagName.length + 2 + selectedText.length;
             textarea.focus();
             textarea.setSelectionRange(cursorPos, cursorPos);
@@ -479,36 +634,49 @@
         function insertLink() {
             const url = prompt('リンクURLを入力:', 'https://');
             if (!url) return;
-            
             const textarea = bodyInput;
             const start = textarea.selectionStart;
             const end = textarea.selectionEnd;
             const selectedText = textarea.value.substring(start, end) || 'リンクテキスト';
             const before = textarea.value.substring(0, start);
             const after = textarea.value.substring(end);
-            
             const newText = `<a href="${url}">${selectedText}</a>`;
             textarea.value = before + newText + after;
             textarea.focus();
         }
 
-        // ==================== ニュース管理 ====================
+        // ニュース管理
         function getNews() {
-            if (window.NewsData && window.NewsData.getAll) {
-                return window.NewsData.getAll();
-            }
             try {
-                const stored = localStorage.getItem('raid3_news_admin');
-                return stored ? JSON.parse(stored) : [];
-            } catch (e) { return []; }
+                const stored = localStorage.getItem(STORAGE_KEY);
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        return parsed;
+                    }
+                }
+            } catch (e) {
+                console.error('Failed to load news:', e);
+            }
+            return [...defaultNews];
         }
 
-        function saveNewsToStorage(news) {
-            localStorage.setItem('raid3_news_admin', JSON.stringify(news));
+        function saveNews(news) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(news));
+                console.log('Saved', news.length, 'news items');
+            } catch (e) {
+                console.error('Failed to save news:', e);
+                alert('保存に失敗しました: ' + e.message);
+            }
+        }
+
+        function sortByDate(items) {
+            return [...items].sort((a, b) => new Date(b.date) - new Date(a.date));
         }
 
         function renderList() {
-            const items = getNews();
+            const items = sortByDate(getNews());
             document.getElementById('newsCount').textContent = items.length;
             
             if (!items.length) {
@@ -546,6 +714,12 @@
                 const actions = document.createElement('div');
                 actions.className = 'news-editor-actions';
 
+                const previewBtn = document.createElement('button');
+                previewBtn.className = 'btn btn-secondary';
+                previewBtn.textContent = '👁️';
+                previewBtn.title = 'プレビュー';
+                previewBtn.onclick = () => showPreview(item);
+
                 const editBtn = document.createElement('button');
                 editBtn.className = 'btn btn-secondary';
                 editBtn.textContent = '編集';
@@ -557,13 +731,14 @@
                 deleteBtn.style.borderColor = '#ef4444';
                 deleteBtn.textContent = '削除';
                 deleteBtn.onclick = () => {
-                    if (confirm('削除しますか？')) {
+                    if (confirm(`「${item.title}」を削除しますか？`)) {
                         const news = getNews().filter(n => n.id !== item.id);
-                        saveNewsToStorage(news);
+                        saveNews(news);
                         renderList();
                     }
                 };
 
+                actions.appendChild(previewBtn);
                 actions.appendChild(editBtn);
                 actions.appendChild(deleteBtn);
 
@@ -582,7 +757,9 @@
             excerptInput.value = item.excerpt || '';
             bodyInput.value = item.body || '';
             thumbUrlInput.value = item.thumbnail || '';
-            setCheckedTags(item.tags || []);
+            setCheckedTags(item.tags);
+            updateThumbnailPreview();
+            renderImageGrid();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
@@ -600,9 +777,8 @@
             const news = getNews();
             const existingEditId = document.getElementById('editId').value;
             
-            // 新規追加時にIDが重複していないかチェック
             if (!existingEditId && news.some(n => n.id === id)) {
-                alert('このIDは既に使われています');
+                alert('このIDは既に使われています。別のIDを入力してください。');
                 return;
             }
 
@@ -617,18 +793,16 @@
             };
 
             if (existingEditId) {
-                // 編集
                 const index = news.findIndex(n => n.id === existingEditId);
                 if (index !== -1) {
                     news[index] = payload;
                 }
             } else {
-                // 新規追加
                 news.unshift(payload);
             }
 
-            saveNewsToStorage(news);
-            alert('保存しました！\n\n公開するには「ZIPでまとめてダウンロード」を押してGitHubにアップロードしてください。');
+            saveNews(news);
+            alert('✅ 保存しました！\n\n公開するには「ZIPでまとめてダウンロード」を押してGitHubにアップロードしてください。');
             resetForm();
             renderList();
         }
@@ -638,18 +812,88 @@
             form.reset();
             setCheckedTags([]);
             dateInput.value = new Date().toISOString().slice(0, 10);
+            thumbPreview.innerHTML = 'なし';
+            renderImageGrid();
         }
 
         function clearAllData() {
             if (confirm('すべてのニュースと画像を削除しますか？この操作は取り消せません。')) {
-                localStorage.removeItem('raid3_news_admin');
+                localStorage.removeItem(STORAGE_KEY);
                 indexedDB.deleteDatabase(DB_NAME);
                 uploadedImages = {};
                 location.reload();
             }
         }
 
-        // ==================== エクスポート ====================
+        // プレビュー
+        function previewCurrent() {
+            const item = {
+                id: newsIdInput.value.trim() || 'preview',
+                title: titleInput.value.trim() || 'プレビュー',
+                date: dateInput.value,
+                thumbnail: thumbUrlInput.value.trim(),
+                tags: getCheckedTags(),
+                excerpt: excerptInput.value.trim(),
+                body: bodyInput.value.trim()
+            };
+            showPreview(item);
+        }
+
+        function showPreview(item) {
+            const html = generatePreviewHTML(item);
+            const frame = document.getElementById('previewFrame');
+            frame.srcdoc = html;
+            document.getElementById('previewModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePreview() {
+            document.getElementById('previewModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('previewModal').addEventListener('click', (e) => {
+            if (e.target.id === 'previewModal') closePreview();
+        });
+
+        function getImageSrc(path) {
+            if (!path) return null;
+            const filename = path.replace(/^(\.\.\/)?images\//, '');
+            if (uploadedImages[filename]) return uploadedImages[filename];
+            return null;
+        }
+
+        function generatePreviewHTML(item) {
+            const thumbSrc = getImageSrc(item.thumbnail) || '';
+            return `<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #fff; padding: 2rem; line-height: 1.8; }
+.tags { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.tag { background: rgba(200,255,0,0.2); color: #c8ff00; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.8rem; }
+h1 { font-size: 2rem; margin-bottom: 0.5rem; font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.05em; }
+.date { color: #666; font-size: 0.9rem; margin-bottom: 2rem; }
+.image { width: 100%; max-height: 400px; object-fit: cover; border-radius: 8px; margin-bottom: 2rem; }
+.placeholder { width: 100%; height: 200px; background: #1a1a1a; display: flex; align-items: center; justify-content: center; border-radius: 8px; margin-bottom: 2rem; color: #333; font-size: 3rem; font-weight: bold; }
+.body { font-size: 1rem; }
+.body p { margin-bottom: 1rem; }
+.body h2 { font-size: 1.5rem; margin: 2rem 0 1rem; color: #c8ff00; }
+.body ul { margin: 1rem 0 1rem 1.5rem; }
+.body li { margin-bottom: 0.5rem; }
+.body a { color: #c8ff00; }
+</style>
+</head><body>
+<div class="tags">${(item.tags || []).map(t => `<span class="tag">#${escapeHtml(t)}</span>`).join('')}</div>
+<h1>${escapeHtml(item.title)}</h1>
+<p class="date">${item.date || ''}</p>
+${thumbSrc ? `<img class="image" src="${thumbSrc}">` : '<div class="placeholder">R3</div>'}
+<div class="body">${item.body || '<p>本文がありません</p>'}</div>
+</body></html>`;
+        }
+
+        // エクスポート
         async function exportZip() {
             const btn = document.getElementById('exportZipBtn');
             btn.disabled = true;
@@ -657,27 +901,28 @@
 
             try {
                 const zip = new JSZip();
-                const news = getNews();
+                const news = sortByDate(getNews());
 
-                // news-data.js を生成
+                if (news.length === 0) {
+                    alert('エクスポートする記事がありません');
+                    return;
+                }
+
                 const newsDataJs = generateNewsDataJS(news);
                 zip.file('news-data.js', newsDataJs);
 
-                // 個別記事HTMLを生成
                 const newsFolder = zip.folder('news');
                 news.forEach(item => {
                     const html = generateArticleHTML(item);
                     newsFolder.file(`${item.id}.html`, html);
                 });
 
-                // 画像をZIPに追加
                 const imgFolder = zip.folder('images');
                 for (const [filename, data] of Object.entries(uploadedImages)) {
                     const base64 = data.split(',')[1];
                     imgFolder.file(filename, base64, { base64: true });
                 }
 
-                // ZIPをダウンロード
                 const blob = await zip.generateAsync({ type: 'blob' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -686,7 +931,7 @@
                 a.click();
                 URL.revokeObjectURL(url);
 
-                alert(`ZIPファイルを作成しました！\n\n含まれるファイル:\n・news-data.js\n・news/${news.map(n => n.id + '.html').join(', ')}\n・images/${Object.keys(uploadedImages).join(', ') || 'なし'}\n\n解凍してGitHubにアップロードしてください。`);
+                alert(`✅ ZIPファイルを作成しました！\n\n含まれるファイル:\n・news-data.js\n・news/${news.map(n => n.id + '.html').join(', ')}\n・images/${Object.keys(uploadedImages).length}枚\n\n解凍してGitHubにアップロードしてください。`);
             } catch (e) {
                 console.error(e);
                 alert('エラーが発生しました: ' + e.message);
@@ -697,12 +942,9 @@
         }
 
         function generateNewsDataJS(news) {
-            // 日付順にソート
-            const sorted = [...news].sort((a, b) => new Date(b.date) - new Date(a.date));
-            
             return `// RAID3 News Data - Generated ${new Date().toISOString()}
 (function() {
-    const defaultNews = ${JSON.stringify(sorted, null, 2)};
+    const defaultNews = ${JSON.stringify(news, null, 2)};
     const TAGS = ['ANNOUNCEMENT', 'TEAM', 'EVENT', 'STORE', 'STREAM', 'WEB3'];
     function getStoredNews() { try { const s = localStorage.getItem('raid3_news'); return s ? JSON.parse(s) : null; } catch(e) { return null; } }
     function saveNews(n) { try { localStorage.setItem('raid3_news', JSON.stringify(n)); } catch(e) {} }
@@ -724,7 +966,6 @@
             const title = escapeHtml(item.title);
             const desc = item.excerpt || (item.body ? escapeHtml(item.body.replace(/<[^>]*>/g, '').substring(0, 100)) : 'RAID3 - Web3 Gaming is Inevitable');
             
-            // OGP画像URL
             let ogImage = `${SITE_URL}/images/R3aicon.png`;
             if (item.thumbnail) {
                 if (item.thumbnail.startsWith('http')) {
@@ -798,7 +1039,7 @@
             return div.innerHTML;
         }
 
-        // ==================== 初期化 ====================
+        // 初期化
         async function init() {
             await initDB();
             await loadAllImages();
@@ -808,17 +1049,7 @@
             renderList();
 
             form.addEventListener('submit', handleSubmit);
-            resetBtn.addEventListener('click', resetForm);
-            resetDataBtn.addEventListener('click', () => {
-                if (confirm('初期データに戻しますか？現在の変更は失われます。')) {
-                    localStorage.removeItem('raid3_news_admin');
-                    if (window.NewsData && window.NewsData.reset) {
-                        window.NewsData.reset();
-                    }
-                    renderList();
-                    resetForm();
-                }
-            });
+            document.getElementById('resetBtn').addEventListener('click', resetForm);
         }
 
         init();
