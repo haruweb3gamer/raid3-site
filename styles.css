@@ -1312,4 +1312,33 @@ footer {
     }
     
     .news-article { padding: 6rem 1.5rem 3rem; }
+
+    /* クリエイターカード - スマホ向け調整 */
+    .creator-info {
+        padding: 1rem;
+        background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.6) 40%, transparent 100%);
+    }
+    .creator-name {
+        font-size: 1.1rem;
+        margin-bottom: 0.15rem;
+    }
+    .creator-role {
+        font-size: 0.55rem;
+        margin-bottom: 0.5rem;
+    }
+    .creator-socials {
+        gap: 0.5rem;
+    }
+    .creator-socials a {
+        font-size: 0.6rem;
+    }
+
+    /* ロゴマーキー - スマホ向け調整 */
+    .logo-marquee-item img {
+        height: 35px;
+        max-width: 120px;
+    }
+    .logo-marquee-track {
+        gap: 40px;
+    }
 }
