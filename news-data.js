@@ -1,6 +1,18 @@
-// RAID3 News Data - Generated 2025-12-17T01:33:03.641Z
+// RAID3 News Data - Generated 2025-12-20T00:03:17.193Z
 (function() {
     const defaultNews = [
+  {
+    "id": "005",
+    "title": "Oshio｜Axie Infinity 公式デザインコンテストにて2位入賞",
+    "date": "2025-12-19",
+    "tags": [
+      "ANNOUNCEMENT",
+      "TEAM"
+    ],
+    "thumbnail": "images/news005.png",
+    "excerpt": "RAID3所属OshioがCodex公式コンテストで2位入賞。作品「Wind bell」はNFTとして実装予定。",
+    "body": "<p>\n💠Codex Accessory Design Contestにて、  \nRAID3所属クリエイター・Oshioの作品【Wind bell】が2位に入賞しました。\n</p>\n\n<p>\n💠本入賞作品は、今後Codex内で入手可能なNFTアクセサリーとして実装予定です。\n</p>\n\n<h2>Axie Infinityとは？</h2>\n\n<p>\nAxie Infinityは、ファンタジーなモンスター「Axie」を集めて育成し、バトルを楽しむことができるWEB3ゲームです。  \n世界中のプレイヤーが参加し、NFTとブロックチェーン技術を活用したゲーム体験を提供しています。\n</p>\n\n<h3>展開中のAxie Infinityシリーズ</h3>\n\n<ul>\n  <li>Axie Infinity Classic</li>\n  <li>Axie Infinity Origins</li>\n  <li>Axie Infinity Homeland</li>\n  <li>Axie Infinity Atia's Legacy（開発中）</li>\n</ul>\n\n<p>\nAxie Infinityは、現在これら4つのタイトルを軸にエコシステムを展開しています。\n</p>\n\n<h2>リンク集</h2>\n\n<ul>\n  <li>\n    <a href=\"https://axieinfinity.com\" target=\"_blank\" rel=\"noopener noreferrer\">\n      Axie Infinity 公式サイト\n    </a>\n  </li>\n  <li>\n    <a href=\"https://x.com/AxieInfinity/status/2001970953400819996?s=20\" target=\"_blank\" rel=\"noopener noreferrer\">\n      Codex Accessory Design Contest 公式発表（X）\n    </a>\n  </li>\n  <li>\n    <a href=\"https://x.com/oshiosann\" target=\"_blank\" rel=\"noopener noreferrer\">\n      Oshio（X）\n    </a>\n  </li>\n</ul>"
+  },
   {
     "id": "003",
     "title": "２周年記念配信決定",
