@@ -1,6 +1,31 @@
-// RAID3 News Data - Generated 2025-12-20T00:03:17.193Z
+// RAID3 News Data - Generated 2025-12-20T15:46:10.815Z
 (function() {
     const defaultNews = [
+  {
+    "id": "007",
+    "title": "【告知】「サインはB」歌ってみた公開記念｜BCG小町 サイン入りチェキ風ネットプリント配布開始",
+    "date": "2025-12-20",
+    "tags": [
+      "ANNOUNCEMENT",
+      "TEAM",
+      "EVENT"
+    ],
+    "thumbnail": "images/image22.png",
+    "excerpt": "「サインはB」歌ってみた動画の公開を記念し、BCG小町のサイン入りチェキ風ネットプリントを期間限定で配布決定！",
+    "body": "<p>\n「歌ってみた」動画の公開を記念して、  \nRAID3メンバーによるユニット「BCG小町」の  \nサイン＆メッセージ入りチェキ風ネットプリントの配布を開始しました。\n</p>\n\n<p>\n本企画では、「【歌ってみた】サインはB covered by BCG小町」の公開を記念し、  \noshio、星こにあ、Lateωによる特別デザインのチェキ風ビジュアルをご用意しています。\n</p>\n\n<h2>ネットプリント配布情報</h2>\n\n<p>\n全国のコンビニエンスストアにて、期間限定で印刷が可能です。  \nお近くの店舗にてぜひお楽しみください。\n</p>\n\n<h2>ローソン／ファミリーマート</h2>\n\n<ul>\n  <li>\n    ユーザー番号：<strong>THWN4DHBGU</strong>\n  </li>\n</ul>\n\n<h2>セブン‐イレブン</h2>\n\n<ul>\n  <li>\n    予約番号：<strong>NXC596MK</strong>\n  </li>\n</ul>\n\n<h2>配布期間</h2>\n\n<p>\n2024年12月20日 ～ 2025年1月4日\n</p>\n\n<p>\n全3種のデザインの中から、お好きな1枚を印刷することができます。  \nぜひこの機会にお近くのコンビニでプリントしてお楽しみください。\n</p>\n\n<p>\n印刷された際は、SNS等でのご報告もお待ちしています。\n</p>\n\n<h2>関連動画</h2>\n\n<ul>\n  <li>\n    <a href=\"https://youtu.be/QY6dfnIhtW0?si=QpSVKKZOzB7Knr_n\" target=\"_blank\" rel=\"noopener noreferrer\">\n      【歌ってみた】サインはB covered by BCG小町\n    </a>\n  </li>\n</ul>\n<h2>RAID3 公式リンク</h2>\n\n<ul>\n  <li>\n    X：\n    <a href=\"https://x.com/RAID3__\" target=\"_blank\" rel=\"noopener noreferrer\">\n      https://x.com/RAID3__\n    </a>\n  </li>\n  <li>\n    YouTube：\n    <a href=\"https://www.youtube.com/@RAID3_2025\" target=\"_blank\" rel=\"noopener noreferrer\">\n      https://www.youtube.com/@RAID3_2025\n    </a>\n  </li>\n</ul>"
+  },
+  {
+    "id": "006",
+    "title": "RAID3リブランディング記念歌ってみた動画公開",
+    "date": "2025-12-20",
+    "tags": [
+      "ANNOUNCEMENT",
+      "TEAM"
+    ],
+    "thumbnail": "images/2328d8cf80bbf16f.png",
+    "excerpt": "RAID3所属Vtuber/Vstreamerの星こにあ・Oshio・LateωがRAID3のリブランディングを記念して特別ユニットBCG小町を結成、TVアニメ【推しの子】挿入歌『サインはB』の歌ってみたを公式Youtubeにて公開",
+    "body": "<p>\n2024年12月21日（土）に実施したRAID3のリブランディング記念配信内にて、  \nサプライズで「歌ってみた」動画がプレミア公開されました。\n</p>\n\n<p>\nTVアニメ『【推しの子】』の挿入歌  「サインはB 」を、RAID3メンバーによるユニット  「BCG小町」がカバーしています。\n</p>\n\n<h2>プレミア公開動画</h2>\n\n<ul>\n  <li>\n    <a href=\"https://youtu.be/QY6dfnIhtW0?si=QpSVKKZOzB7Knr_n\" target=\"_blank\" rel=\"noopener noreferrer\">\n      【歌ってみた】サインはB covered by BCG小町\n    </a>\n  </li>\n</ul>\n\n<h2>楽曲情報</h2>\n\n<p>\nOriginal：TVアニメ『【推しの子】』  \n「サインはB -New Arrange Ver.-」\n</p>\n\n<h2>クレジット</h2>\n\n<ul>\n  <li>\n    Vocal：BCG小町（RAID3）\n  </li>\n  <li>\n    Lateω  \n    ｜X：\n    <a href=\"https://x.com/Bel_L_0o\" target=\"_blank\" rel=\"noopener noreferrer\">\n      @Bel_L_0o\n    </a>\n    ｜Twitch：\n    <a href=\"https://www.twitch.tv/o0_late_0o\" target=\"_blank\" rel=\"noopener noreferrer\">\n      o0_late_0o\n    </a>\n  </li>\n  <li>\n    星こにあ  \n    ｜X：\n    <a href=\"https://x.com/hoshiconia\" target=\"_blank\" rel=\"noopener noreferrer\">\n      @hoshiconia\n    </a>\n    ｜YouTube：\n    <a href=\"https://www.youtube.com/channel/UC32lMZ5T75_5DqVamanCw_Q\" target=\"_blank\" rel=\"noopener noreferrer\">\n      チャンネル\n    </a>\n  </li>\n  <li>\n    oshio  \n    ｜X：\n    <a href=\"https://x.com/oshiosann\" target=\"_blank\" rel=\"noopener noreferrer\">\n      @oshiosann\n    </a>\n    ｜Twitch：\n    <a href=\"https://www.twitch.tv/oshio_axievtuber\" target=\"_blank\" rel=\"noopener noreferrer\">\n      oshio_axievtuber\n    </a>\n  </li>\n  <li>\n    Music・Lyrics：大石昌良\n  </li>\n  <li>\n    Arrange・Mix：\n    <a href=\"https://x.com/fugahatori\" target=\"_blank\" rel=\"noopener noreferrer\">\n      羽鳥風画（X）\n    </a>\n  </li>\n  <li>\n    Illust・Movie：oshio\n  </li>\n</ul>\n\n<p>\n本動画の制作にご協力いただいたすべての関係者の皆様に、心より感謝申し上げます。\n</p>\n\n<p>\nぜひチャンネル登録・高評価をよろしくお願いいたします。\n</p>\n\n<h2>RAID3 公式リンク</h2>\n\n<ul>\n  <li>\n    X：\n    <a href=\"https://x.com/RAID3__\" target=\"_blank\" rel=\"noopener noreferrer\">\n      https://x.com/RAID3__\n    </a>\n  </li>\n  <li>\n    YouTube：\n    <a href=\"https://www.youtube.com/@RAID3_2025\" target=\"_blank\" rel=\"noopener noreferrer\">\n      https://www.youtube.com/@RAID3_2025\n    </a>\n  </li>\n</ul>"
+  },
   {
     "id": "005",
     "title": "Oshio｜Axie Infinity 公式デザインコンテストにて2位入賞",
